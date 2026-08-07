@@ -1,0 +1,4 @@
+interface:
+  display_name: "Base TSAM Create"
+  short_description: "Create and remove TSAM datasets for Base tests"
+  default_prompt: "Use $base-tsam-create to prepare or clean up the TSAM datasets required by this test."

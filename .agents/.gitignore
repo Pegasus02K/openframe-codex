@@ -1,0 +1,2 @@
+# Keep machine-specific OpenFrame connection and path settings local.
+openframe.local.yaml

@@ -1,0 +1,4 @@
+interface:
+  display_name: "OpenFrame Config Manage"
+  short_description: "Inspect, update, and restore OpenFrame test settings"
+  default_prompt: "Use $common-ofconfig-manage to inspect this OpenFrame setting, apply a reversible test change if needed, and restore it afterward."

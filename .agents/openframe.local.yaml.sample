@@ -1,0 +1,22 @@
+version: 2
+
+# Copy this file to .agents/openframe.local.yaml, then replace the example
+# values with paths and connection settings for your own environment.
+# Keep openframe.local.yaml private; do not put real credentials in this sample.
+default_environment: "local"
+manual_base: "C:/path/to/Tmax/manual"
+
+environments:
+  local:
+    type: "local"
+    source_base: "C:/path/to/Tmax"
+    # Add this only when the local environment needs direct Tibero access.
+    # tibero_connect_string: "user/password"
+
+  remote:
+    type: "ssh_container"
+    source_base: "/path/to/openframe/source"
+    ssh_private_key: "C:/path/to/private-key.pem"
+    ssh_address: "user@example-host"
+    of_container_name: "openframe-container"
+    tibero_connect_string: "user/password"

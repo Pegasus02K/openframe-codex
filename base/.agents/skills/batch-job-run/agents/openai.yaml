@@ -1,0 +1,4 @@
+interface:
+  display_name: "Batch Job Run"
+  short_description: "Submit and verify OpenFrame Batch test jobs"
+  default_prompt: "Use $batch-job-run to deploy this JCL, submit it with tjesmgr, and verify its job and spool results."
