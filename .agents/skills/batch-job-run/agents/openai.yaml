@@ -1,4 +1,0 @@
-interface:
-  display_name: "OpenFrame Batch Job Run"
-  short_description: "Validate, submit, and inspect OpenFrame batch JCL"
-  default_prompt: "Use $batch-job-run to validate, submit, monitor, and inspect this OpenFrame JCL job."

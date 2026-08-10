@@ -1,0 +1,4 @@
+interface:
+  display_name: "Common TmaxSoft Jira Read"
+  short_description: "Read visible TmaxSoft Jira issues safely"
+  default_prompt: "Use $common-tmaxsoft-jira-read to read this TmaxSoft Jira issue safely and report the visible facts."
