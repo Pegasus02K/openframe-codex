@@ -3,6 +3,17 @@
 # Learn more about .gitignore:
 #     https://www.atlassian.com/git/tutorials/saving-changes/gitignore
 
+# Project agent definitions are shared source files and must remain visible to Git.
+# New files still require `git add -A`; `git add -u` only stages tracked files.
+!/.agents/
+!/.agents/.gitignore
+!/.agents/openframe.local.yaml.sample
+!/.agents/skills/
+!/.agents/skills/**
+!**/.agents/
+!**/.agents/skills/
+!**/.agents/skills/**
+
 # Node artifact files
 node_modules/
 dist/

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Common NetCOBOL Compile"
+  short_description: "Build and install Fujitsu COBOL test programs"
+  default_prompt: "Use $common-netcobol-compile to create, compile, and install this Fujitsu COBOL test program."
