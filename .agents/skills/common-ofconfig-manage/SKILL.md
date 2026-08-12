@@ -10,7 +10,7 @@ description: OpenFrame 테스트 중 환경설정을 ofconfig list로 조회하�
 ## 기본 원칙
 
 1. 루트 `AGENTS.md`와 `.agents/openframe.local.yaml`에서 선택한 환경 프로필로 진입한다.
-2. 소스 작업은 선택한 환경의 `{{source_base}}`에서 수행한다.
+2. 환경 파일에서 읽은 `$SOURCE_BASE`에서 소스 작업을 수행한다.
 3. 노드 이름을 추측하거나 `NODE1`로 고정하지 않는다. 모든 `list`, `update` 명령의 `-n`에는 `$OPENFRAME_NODENAME`을 사용한다.
 4. subject, section, key 이름은 관련 제품의 configuration guide나 기존 설정 조회로 확인한다. 비슷해 보이는 이름을 추측하지 않는다.
 5. 테스트용 변경은 기존 키의 `VALUE`에 한정한다. `add`, `delete`, `truncate`, `import` 또는 DB 직접 수정은 이 스킬의 기본 작업 범위가 아니다.
@@ -166,5 +166,5 @@ ofconfig list   -n "$node_name" -s "$subject" -sec "$section" -k "$key" -l
 
 - 명령 매뉴얼: `{{manual_base}}/openframe_base/docs/modules/tool-reference-guide/pages/etc/sect-ofconfig.adoc`
 - 설정 매뉴얼: 관련 제품 매뉴얼의 `configuration-guide`
-- 명령 구현: `{{source_base}}/base/src/tool/ofconfig/ofconfig_main.c`
-- 설정 공통 구현: `{{source_base}}/base/src/common/ofcom/ofcom_conf.c`
+- 명령 구현: `$SOURCE_BASE/base/src/tool/ofconfig/ofconfig_main.c`
+- 설정 공통 구현: `$SOURCE_BASE/base/src/common/ofcom/ofcom_conf.c`

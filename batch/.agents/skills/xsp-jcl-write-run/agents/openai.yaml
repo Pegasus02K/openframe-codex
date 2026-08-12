@@ -1,0 +1,4 @@
+interface:
+  display_name: "XSP JCL Write and Run"
+  short_description: "Write and verify OpenFrame XSP batch JCL"
+  default_prompt: "Use $xsp-jcl-write-run to write an XSP JCL job, submit it, and verify the job, step RC, and spool."

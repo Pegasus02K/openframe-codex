@@ -1,18 +1,17 @@
 ## `batch/AGENTS.md`
 
 ### 적용 범위
-이 문서는 `ofsrc/batch/util` 하위에서만 적용되는 추가 지침이다.
+이 문서는 `$SOURCE_BASE/batch/util/**`에서만 적용되는 추가 지침이다.
 루트 `AGENTS.md`의 공통 규칙과 지침 라우팅을 먼저 따르고, 여기에는 `batch/util` 전용 사항만 적는다.
 
 - 이 파일이 로컬에서 `batch/AGENTS.md`에 있더라도 아래 제품별 규칙은 `batch/util/**` 작업에만 적용한다. 그 밖의 `batch` 경로는 루트와 실제 대상 경로에서 발견한 더 가까운 `AGENTS.md`를 따른다.
-- Jira 이슈를 근거로 작업하면 루트의 `tmaxsoft-jira-read` 연동 절차로 요구사항을 읽은 뒤 이 문서를 적용한다.
 - Jira에서 확인한 job, utility, 입력 또는 오류 정보는 실제 JCL·호출 경로·종료 코드·스풀에서 검증한다.
 - `base` 등 다른 제품도 함께 수정하면 해당 경로의 `AGENTS.md`를 추가로 읽고 제품 간 회귀 범위를 합친다.
 
 ### 사양
 Batch 제품은 OpenFrame 제품에서 batch job을 실행하는 엔진에 대응하는 제품(tjes)이며, util은 그 중에서도 dataset, DB 조작에 관련된 batch job utility를 담당한다..
 
-- 제품에 대한 매뉴얼은 `C:\Work\srcs\Tmax\manual\openframe_batch`를 참고한다.
+- 제품에 대한 매뉴얼은 `{{manual_base}}/openframe_batch`를 참고한다.
 
 ### 작업 원칙
 - `batch` 실행 흐름과 연결된 유틸리티 변경은 잡 실행 영향까지 고려한다.

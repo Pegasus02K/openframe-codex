@@ -1,17 +1,16 @@
 ## `ndb/AGENTS.md`
 
 ### 적용 범위
-이 문서는 `ofsrc/ndb` 하위에서만 적용되는 추가 지침이다.
+이 문서는 `$SOURCE_BASE/ndb/**`에서만 적용되는 추가 지침이다.
 루트 `AGENTS.md`의 공통 규칙과 지침 라우팅을 먼저 따르고, 여기에는 `ndb` 전용 사항만 적는다.
 
-- Jira 이슈를 근거로 작업하면 루트의 `tmaxsoft-jira-read` 연동 절차로 요구사항을 읽은 뒤 이 문서를 적용한다.
 - Jira에서 확인한 스키마, SQL, 데이터 또는 오류 정보는 현재 `ndb`의 실제 정의·접근 경로·DB 로그에서 다시 검증한다.
 - 공통 DB 계층이나 다른 제품도 함께 수정하면 해당 경로의 `AGENTS.md`를 추가로 읽고 데이터 정합성 검증 범위를 합친다.
 
 ### 사양
 이 제품은 OpenFrame 제품에서 Fujitsu AIM DB, Hitachi XDM/SD DB에 대응하는 제품이다.
 
-- 제품에 대한 매뉴얼은 `C:\Work\srcs\Tmax\manual\openframe_ndb`를 참고한다.
+- 제품에 대한 매뉴얼은 `{{manual_base}}/openframe_ndb`를 참고한다.
 
 ### 작업 원칙
 - `ndb` 관련 변경은 데이터 처리, 저장, 조회 흐름을 먼저 확인한다.

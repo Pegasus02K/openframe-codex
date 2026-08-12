@@ -14,7 +14,7 @@
 - `.agents/openframe.local.yaml`이 없으면 `.agents/openframe.local.yaml.sample`을 복사해 자신의 경로와 접속 환경에 맞게 `.agents/openframe.local.yaml`을 개인화해야 한다고 사용자에게 알린다. 설정이 준비되기 전에는 샘플 값을 그대로 사용하거나 값을 추측해 작업 환경에 진입하지 않는다.
 - `.agents/openframe.local.yaml.sample`은 체크아웃 사용자를 위한 버전 관리 대상 예시다. 이 파일에는 실제 개인 경로, 계정, 호스트, 개인키 경로, 접속 문자열 같은 개인·민감 정보를 기록하지 않는다.
 - 로컬 설정의 `environments`에는 작업 가능한 환경 프로필을 정의하고, `default_environment`에는 기본 프로필 이름을 지정한다. 각 프로필의 `type`은 로컬 머신에서 직접 작업하는 `local` 또는 SSH 대상의 Docker 컨테이너에서 작업하는 `ssh_container` 중 하나다.
-- 사용자가 환경이나 대상 경로를 명시하면 그 경로를 포함하는 프로필을 선택하고, 명시하지 않으면 `default_environment` 프로필을 선택한다. 둘 이상의 프로필이 일치하거나 어느 프로필에도 대응되지 않으면 임의로 선택하지 말고 사용자에게 확인한다.
+- 사용자가 환경 프로필 이름을 명시하면 그 프로필을 선택하고, 명시하지 않으면 `default_environment` 프로필을 선택한다. 선택 후 `env_path`를 적용해 얻은 `$SOURCE_BASE`가 사용자가 지정한 대상 경로와 맞지 않으면 다른 프로필을 추측하지 말고 사용자에게 확인한다.
 - 이하의 `{{key}}` 표기는 선택한 환경 프로필의 같은 이름을 가진 키 값으로 치환한다. `{{manual_base}}`처럼 프로필에 없는 공통 키는 설정의 최상위 키에서 찾는다. 실제 명령을 실행할 때는 현재 셸에 맞게 값을 인용한다.
 - 로컬 설정에는 다음 공통 키가 필요하다.
 
@@ -30,7 +30,7 @@
   | 키 | 의미 | 값이 사용되는 위치 |
   | --- | --- | --- |
   | `type` | `local` 또는 `ssh_container` | 에이전트가 실행되는 로컬 호스트 |
-  | `source_base` | 해당 환경의 OpenFrame 소스 루트 | 선택한 작업 환경 |
+  | `env_path` | 빌드·테스트에 필요한 환경 변수를 설정하는 환경 파일 | 선택한 작업 환경 |
 
 - `ssh_container` 프로필에는 다음 키가 추가로 필요하다.
 
@@ -41,21 +41,24 @@
   | `of_container_name` | OpenFrame 개발 Docker 컨테이너 이름 | SSH 대상 호스트 |
   | `tibero_connect_string` | `tbsql` 접속 문자열 | 컨테이너 |
 
+- `env_path`는 모든 환경 프로필에 필수다. 소스 루트와 OpenFrame 설치 루트는 로컬 설정에 중복 기록하지 않고, 이 환경 파일을 적용한 뒤 각각 `$SOURCE_BASE`와 `$OPENFRAME_HOME`에서 읽는다.
 - `local` 프로필에서 Tibero 접속이 필요한 작업을 수행할 수 있다면 `tibero_connect_string`을 선택적으로 정의한다. 정의되지 않은 기능이 작업에 꼭 필요하면 값을 추측하지 말고 사용자에게 요청한다.
 - 설정 파일이나 선택한 프로필에 필요한 키가 없으면 값을 추측하지 말고 사용자에게 요청한다. 개인키 내용은 요청하지 않고 `ssh_private_key` 경로만 입력받는다.
-- 각 값은 처음 사용하기 전에 해당 실행 위치에서 검증한다. 특히 매뉴얼 경로와 소스 루트가 실제로 존재하는지 확인하고, `ssh_container` 프로필에서는 개인키 파일과 컨테이너도 확인한다.
+- 각 값은 처음 사용하기 전에 해당 실행 위치에서 검증한다. 특히 매뉴얼 경로와 `env_path` 파일이 실제로 존재하는지 확인하고, `ssh_container` 프로필에서는 개인키 파일과 컨테이너도 확인한다.
+- 선택한 작업 환경에 진입하면 다른 작업보다 먼저 `env_path`를 현재 셸에 맞는 방식으로 적용한다. 환경 파일은 신뢰된 로컬 셸 코드로 취급하며 내용을 불필요하게 출력하지 않는다. 적용 후 `$SOURCE_BASE`와 `$OPENFRAME_HOME`이 모두 비어 있지 않고 각각 실제 디렉터리를 가리키는지 확인한다.
+- 환경 파일 적용 결과는 셸 프로세스마다 유지된다. 새 셸을 열거나 별도의 `docker exec`로 명령을 실행할 때마다 같은 명령 안에서 `env_path`를 다시 적용한 뒤 작업한다.
 - OpenFrame 노드 이름은 로컬 설정에 두지 않고 선택한 환경에 설정된 `$OPENFRAME_NODENAME`을 사용한다. 관련 명령을 실행하기 전에 이 값이 비어 있지 않은지 확인한다.
 - 접속 문자열 등 민감할 수 있는 값은 불필요하게 화면이나 작업 보고에 출력하지 않는다.
 
 ## 지침 라우팅
-작업을 시작할 때 선택한 환경의 `{{source_base}}`를 기준으로 아래 지침을 선택한다.
+작업을 시작할 때 `env_path`에서 읽은 `$SOURCE_BASE`를 기준으로 아래 지침을 선택한다.
 
 | 작업 대상 | 함께 적용할 하위 지침 | 비고 |
 | --- | --- | --- |
-| `{{source_base}}/base/**` | `base/AGENTS.md` | OpenFrame Base |
-| `{{source_base}}/batch/util/**` | `batch/AGENTS.md` | Batch 유틸리티 전용 규칙 |
-| `{{source_base}}/ims/**` | `ims/AGENTS.md` | OpenFrame HiDB |
-| `{{source_base}}/ndb/**` | `ndb/AGENTS.md` | OpenFrame NDB |
+| `$SOURCE_BASE/base/**` | `base/AGENTS.md` | OpenFrame Base |
+| `$SOURCE_BASE/batch/util/**` | `batch/AGENTS.md` | Batch 유틸리티 전용 규칙 |
+| `$SOURCE_BASE/ims/**` | `ims/AGENTS.md` | OpenFrame HiDB |
+| `$SOURCE_BASE/ndb/**` | `ndb/AGENTS.md` | OpenFrame NDB |
 | 그 밖의 경로 | 루트 `AGENTS.md` 및 실제 경로에서 발견한 더 가까운 `AGENTS.md` | 경로를 확인한 뒤 적용 |
 
 - 위 표는 현재 로컬 지침의 연결 관계다. 선택한 환경의 실제 소스에 더 가까운 `AGENTS.md`가 있는지도 작업마다 현재 셸에 맞는 검색 명령으로 확인하고, 발견되면 함께 읽는다.
@@ -73,6 +76,9 @@
 ### OpenFrame 배치 잡 실행 스킬
 사용자가 OpenFrame Batch 테스트 JCL 제출·실행, JOB 상태·STEP RC·SPOOL 결과 검증 또는 배치 실패 원인 조사를 요청하면 `batch-job-run` 스킬을 사용한다.
 
+### XSP JCL 작성 및 실행 스킬
+사용자가 XSP JCL 작성, MVS 형식 JCL의 XSP 변환, XSP JCL 문법 오류 수정 또는 작성한 XSP JCL의 실제 실행 검증을 요청하면 `xsp-jcl-write-run` 스킬을 사용한다. 실제 제출·실행이 포함되면 `batch-job-run` 스킬도 함께 사용한다.
+
 ### OpenFrame 설정 관리 스킬
 사용자가 OpenFrame 설정 조회, 상세 정보·허용 범위 확인, 테스트를 위한 가역적 임시 변경 또는 원래 값 복원을 요청하면 `common-ofconfig-manage` 스킬을 사용한다.
 
@@ -81,11 +87,17 @@
 
 ### 로컬 환경
 
-`type: local`이면 에이전트가 실행되는 로컬 호스트에서 소스 루트로 직접 이동한다. 현재 셸에 맞는 명령을 사용한다.
+`type: local`이면 에이전트가 실행되는 로컬 호스트에서 환경 파일을 먼저 적용한 후 소스 루트로 이동한다. 현재 셸에 맞는 명령을 사용한다. POSIX 셸에서는 다음과 같이 실행한다.
 
-```text
-cd "{{source_base}}"
+```sh
+test -f "{{env_path}}"
+. "{{env_path}}"
+test -d "${SOURCE_BASE:?SOURCE_BASE is not set}"
+test -d "${OPENFRAME_HOME:?OPENFRAME_HOME is not set}"
+cd "$SOURCE_BASE"
 ```
+
+PowerShell 환경 파일이면 `Test-Path`로 확인하고 dot-source한 뒤 `$env:SOURCE_BASE`와 `$env:OPENFRAME_HOME`이 비어 있지 않고 실제 디렉터리를 가리키는지 확인한다.
 
 파일 수정, 빌드, 테스트, 로그 확인은 모두 이 로컬 환경에서 수행한다.
 
@@ -103,10 +115,20 @@ cd "{{source_base}}"
    docker exec -it "{{of_container_name}}" bash
    ```
 
-3. 컨테이너 내부에서 소스 루트로 이동한다.
+3. 컨테이너 내부에서 환경 파일을 적용하고 OpenFrame 설치 루트를 검증한다.
    ```sh
-   cd "{{source_base}}"
+   test -f "{{env_path}}"
+   . "{{env_path}}"
+   test -d "${SOURCE_BASE:?SOURCE_BASE is not set}"
+   test -d "${OPENFRAME_HOME:?OPENFRAME_HOME is not set}"
    ```
+
+4. 같은 셸에서 소스 루트로 이동한다.
+   ```sh
+   cd "$SOURCE_BASE"
+   ```
+
+비대화형 `docker exec`를 별도로 실행할 때는 각 호출에서 `env_path` 적용, 검증, 작업 명령을 하나의 셸 실행으로 묶는다.
 
 ## 주요 수정 범위
 프로젝트 전체를 대상으로 작업하되, 주 수정 범위는 다음 하위 디렉터리다. 각각의 제품명은 OpenFrame Base, Batch, HiDB, NDB다.
@@ -126,11 +148,12 @@ cd "{{source_base}}"
 - 각종 커맨드라인 툴 프로그램은 `base/tool`에서 빌드된다.
 - `.tbc`, `.pc` 확장자 파일을 수정한 경우 `make precomp`로 재빌드한다.
 - `make precomp`가 실패하면 원인을 수정한 뒤 반드시 다시 실행한다.
-- 오류 로그는 화면 출력과  `$TMAXDIR/log` `$OPENFRAME_HOME/log` 디렉터리를 확인한다.
+- `$OPENFRAME_HOME`은 `make install` 산출물과 OpenFrame 로그·운영 생성 파일의 기준 경로다.
+- 오류 로그는 화면 출력과 `$TMAXDIR/log`, `$OPENFRAME_HOME/log` 디렉터리를 확인한다.
 - 오류 코드에 대한 상세 설명은 `oferror 에러코드` 커맨드로 조회한다.
 
 ## 작업 원칙
-- 모든 파일 수정, 빌드, 테스트는 반드시 선택한 환경의 `{{source_base}}`에서 수행한다. `local` 프로필은 로컬 호스트에서, `ssh_container` 프로필은 해당 컨테이너 안에서 수행한다.
+- 모든 파일 수정, 빌드, 테스트는 반드시 선택한 환경의 `env_path`를 먼저 적용한 같은 셸에서 `$SOURCE_BASE`로 이동해 수행한다. `local` 프로필은 로컬 호스트에서, `ssh_container` 프로필은 해당 컨테이너 안에서 수행한다.
 - 현재 위치가 애매하면 현재 셸에 맞는 명령으로 작업 경로와 디렉터리 내용을 먼저 확인한 뒤 진행한다.
 - 경로를 추측하지 말고, 실제 존재를 확인한 후에만 명령을 실행한다.
 - 수정한 범위와 직접 관련된 빌드와 테스트를 우선 수행한다.
@@ -143,9 +166,9 @@ cd "{{source_base}}"
 ## 권장 작업 절차
 1. 요청과 제공된 Jira URL 등 입력 자료에서 작업 범위를 파악한다.
 2. 필요한 스킬의 트리거 여부를 판단하고, 호출한다면 해당 `SKILL.md`와 필요한 참조 문서를 먼저 읽는다.
-3. 로컬 설정에서 작업 대상에 맞는 환경 프로필을 선택하고, 그 환경에서 대상 경로의 존재와 현재 위치를 확인한 뒤 루트부터 대상까지 적용되는 모든 `AGENTS.md`를 읽는다.
+3. 로컬 설정에서 작업 대상에 맞는 환경 프로필을 선택하고, 그 환경에서 `env_path`를 적용한 뒤 `$SOURCE_BASE`, `$OPENFRAME_HOME`, 대상 경로와 현재 위치를 확인하고 루트부터 대상까지 적용되는 모든 `AGENTS.md`를 읽는다.
 4. Jira 등 외부 자료의 확인된 사실과 추론을 구분해 요구사항을 정리하고, 관련 코드·설정·호출 경로를 확인한다.
-5. 필요한 수정만 선택한 환경의 `{{source_base}}`에서 적용한다.
+5. 필요한 수정만 선택한 환경의 `$SOURCE_BASE`에서 적용한다.
 6. 대상 하위 `AGENTS.md`가 요구하는 빌드 또는 테스트를 실행한다.
 7. 결과를 확인하고, 실패 시 로그·오류 코드·처리 흐름으로 원인을 좁혀 수정 후 다시 검증한다. 런타임 부재로 검증할 수 없는 항목은 실패와 구분해 명시한다.
 8. 적용한 지침과 스킬, 변경 사항, 검증 명령, 성공·실패 결과를 요약한다.

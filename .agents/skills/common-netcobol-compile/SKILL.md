@@ -9,7 +9,7 @@ description: 후지쯔 사양 COBOL 테스트 프로그램을 ofcbppf로 전처�
 
 ## 사전 확인
 
-1. 루트 `AGENTS.md`와 `.agents/openframe.local.yaml`에서 선택한 환경 프로필로 진입하고 `{{source_base}}`에서 작업한다.
+1. 루트 `AGENTS.md`와 `.agents/openframe.local.yaml`에서 선택한 환경 프로필로 진입하고, 환경 파일에서 읽은 `$SOURCE_BASE`에서 작업한다.
 2. 소스 파일, copybook, `PROGRAM-ID`, COBOL `SELECT`의 DD 이름, JCL의 프로그램명·DD·`PRGLIB`를 대조한다.
 3. 도구와 환경을 확인한다.
 

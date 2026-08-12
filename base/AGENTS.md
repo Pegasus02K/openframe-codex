@@ -1,17 +1,16 @@
 ## `base/AGENTS.md`
 
 ### 적용 범위
-이 문서는 `ofsrc/base` 하위에서만 적용되는 추가 지침이다.
+이 문서는 `$SOURCE_BASE/base/**`에서만 적용되는 추가 지침이다.
 루트 `AGENTS.md`의 공통 규칙과 지침 라우팅을 먼저 따르고, 여기에는 `base` 전용 사항만 적는다.
 
-- Jira 이슈를 근거로 작업하면 루트의 `tmaxsoft-jira-read` 연동 절차로 요구사항을 읽은 뒤 이 문서를 적용한다.
 - Jira에서 확인한 내용은 작업 범위와 재현 정보로만 사용하고, 실제 dataset·공용 API·도구 영향은 현재 `base` 소스와 설정에서 다시 확인한다.
 - `base` 밖의 모듈도 함께 수정하면 해당 경로의 `AGENTS.md`를 추가로 읽고 공통 인터페이스 검증 범위를 합친다.
 
 ### 사양
 이 제품은 OpenFrame 제품에서 dataset 생성 및 I/O, CPM 및 OpenFrame schema를 이용한 데이터 변환, 런타임에서의 dataset 할당, 각종 커맨드라인 툴을 담당하는 제품이다.
 
-- 제품에 대한 매뉴얼은 `C:\Work\srcs\Tmax\manual\openframe_base`를 참고한다.
+- 제품에 대한 매뉴얼은 `{{manual_base}}/openframe_base`를 참고한다.
 - Dataset에 대한 생성, 삭제, 조회 등은 커맨드라인 툴 dscreate, dsdelete, dslist, listcat 등을 사용한다.
 - Dataset 내용에 대한 상세 조회는 dsview, spfedit을 사용한다.
 - 마이그레이션에 사용되는 주요 프로그램은 dsmigin, dsmigout, cobgensch다.

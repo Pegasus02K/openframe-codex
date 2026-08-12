@@ -9,7 +9,7 @@ JCL을 올바른 `SYS1.JCLLIB`에 배치하고 `tjesmgr`로 제출한 뒤 JOB �
 
 ## 사전 확인
 
-1. VM에 SSH로 접속하고 `of73xsp-pegasus` 컨테이너의 `/opt/oframe/ofsrc`에서 작업한다.
+1. 루트 `AGENTS.md`와 `.agents/openframe.local.yaml`에서 작업 대상에 맞는 환경 프로필을 선택하고, 환경 파일에서 읽은 `$SOURCE_BASE`에서 작업한다.
 2. 실행할 JCL 파일과 멤버 이름을 확인한다. JCL이 호출하는 프로그램, 프로그램 라이브러리, 입력 데이터셋이 준비되어 있는지 확인한다.
 3. 환경과 서비스 상태를 확인한다.
 
@@ -87,6 +87,6 @@ $ tjesmgr
 
 명령이 불확실하면 다음 매뉴얼을 다시 확인한다.
 
-- `C:\Work\srcs\Tmax\manual\openframe_batch\docs\modules\xsp-tjes-guide\pages\chapter-tjesmgr-commands.adoc`
-- `C:\Work\srcs\Tmax\manual\openframe_batch\docs\modules\xsp-tjes-guide\pages\chapter-job-management.adoc`
-- `C:\Work\srcs\Tmax\manual\openframe_batch\docs\modules\batch-installation-guide\pages\chapter-verifying-installation.adoc`
+- `{{manual_base}}/openframe_batch/docs/modules/xsp-tjes-guide/pages/chapter-tjesmgr-commands.adoc`
+- `{{manual_base}}/openframe_batch/docs/modules/xsp-tjes-guide/pages/chapter-job-management.adoc`
+- `{{manual_base}}/openframe_batch/docs/modules/batch-installation-guide/pages/chapter-verifying-installation.adoc`

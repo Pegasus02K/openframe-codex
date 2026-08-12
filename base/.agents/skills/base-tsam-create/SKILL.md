@@ -9,9 +9,8 @@ description: OpenFrame Base 테스트에 필요한 TSAM VSAM 데이터셋과 cop
 
 ## 작업 위치와 사전 확인
 
-1. VM에 SSH로 접속한 뒤 `of73xsp-pegasus` 컨테이너에 들어간다.
-2. 소스 작업은 `/opt/oframe/ofsrc`에서 수행한다.
-3. 다음 값을 추측하지 말고 확인한다.
+1. 루트 `AGENTS.md`와 `.agents/openframe.local.yaml`에서 작업 대상에 맞는 환경 프로필을 선택하고, 환경 파일에서 읽은 `$SOURCE_BASE`에서 작업한다.
+2. 다음 값을 추측하지 말고 확인한다.
 
 ```bash
 pwd
@@ -20,7 +19,7 @@ command -v idcams
 command -v listcat
 ```
 
-4. 테스트의 JCL, COBOL, copybook과 데이터 준비 절차를 읽어 필요한 카탈로그 항목을 표로 정리한다.
+3. 테스트의 JCL, COBOL, copybook과 데이터 준비 절차를 읽어 필요한 카탈로그 항목을 표로 정리한다.
 
 - CLUSTER: 이름, 조직(`KS`, `ES`, `RR`), 평균/최대 레코드 길이
 - KSDS: 키 길이와 offset
@@ -150,5 +149,5 @@ copybook 형태 이외의 문제는 가능한 범위에서 직접 해결하고 �
 
 옵션이 불확실하면 다음 매뉴얼을 확인한다.
 
-- `C:\Work\srcs\Tmax\manual\openframe_base\docs\modules\tool-reference-guide\pages\ds\sect-idcams.adoc`
-- `C:\Work\srcs\Tmax\manual\openframe_base\docs\modules\tool-reference-guide\pages\ds\sect-listcat.adoc`
+- `{{manual_base}}/openframe_base/docs/modules/tool-reference-guide/pages/ds/sect-idcams.adoc`
+- `{{manual_base}}/openframe_base/docs/modules/tool-reference-guide/pages/ds/sect-listcat.adoc`
