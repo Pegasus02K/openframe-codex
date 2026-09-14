@@ -9,7 +9,7 @@ description: OpenFrame 테스트 중 환경설정을 ofconfig list로 조회하�
 
 ## 기본 원칙
 
-1. 루트 `AGENTS.md`와 `.agents/openframe.local.yaml`에서 선택한 환경 프로필로 진입한다.
+1. 루트 `AGENTS.md`와 `.agents/openframe.local.yaml`에서 선택한 환경 프로필로 진입한다. `type: remote`이면 SSH 서버에서 직접 작업하며 컨테이너에 진입하지 않고, `type: remote_container`일 때만 지정된 컨테이너에서 작업한다. 원격 인증은 `ssh_private_key`를 우선하며, 이 값이 없을 때만 `ssh_password`로 접속한다. 둘 다 있으면 비밀번호는 필요한 `sudo` 인증에만 사용하고 노출하거나 명령에 삽입하지 않는다.
 2. 환경 파일에서 읽은 `$SOURCE_BASE`에서 소스 작업을 수행한다.
 3. 노드 이름을 추측하거나 `NODE1`로 고정하지 않는다. 모든 `list`, `update` 명령의 `-n`에는 `$OPENFRAME_NODENAME`을 사용한다.
 4. subject, section, key 이름은 관련 제품의 configuration guide나 기존 설정 조회로 확인한다. 비슷해 보이는 이름을 추측하지 않는다.

@@ -13,7 +13,7 @@
 - 작업을 시작할 때 이 문서와 같은 루트의 `.agents/openframe.local.yaml`을 확인하고 읽는다. 이 파일은 개인별 로컬 설정이므로 버전 관리하지 않으며, 셸 스크립트처럼 실행하거나 `source`하지 않고 데이터로만 읽는다.
 - `.agents/openframe.local.yaml`이 없으면 `.agents/openframe.local.yaml.sample`을 복사해 자신의 경로와 접속 환경에 맞게 `.agents/openframe.local.yaml`을 개인화해야 한다고 사용자에게 알린다. 설정이 준비되기 전에는 샘플 값을 그대로 사용하거나 값을 추측해 작업 환경에 진입하지 않는다.
 - `.agents/openframe.local.yaml.sample`은 체크아웃 사용자를 위한 버전 관리 대상 예시다. 이 파일에는 실제 개인 경로, 계정, 호스트, 개인키 경로, 접속 문자열 같은 개인·민감 정보를 기록하지 않는다.
-- 로컬 설정의 `environments`에는 작업 가능한 환경 프로필을 정의하고, `default_environment`에는 기본 프로필 이름을 지정한다. 각 프로필의 `type`은 로컬 머신에서 직접 작업하는 `local` 또는 SSH 대상의 Docker 컨테이너에서 작업하는 `ssh_container` 중 하나다.
+- 로컬 설정의 `environments`에는 작업 가능한 환경 프로필을 정의하고, `default_environment`에는 기본 프로필 이름을 지정한다. 각 프로필의 `type`은 로컬 머신에서 직접 작업하는 `local`, SSH 대상 서버에서 직접 작업하는 `remote`, 또는 SSH 대상의 Docker 컨테이너에서 작업하는 `remote_container` 중 하나다.
 - 사용자가 환경 프로필 이름을 명시하면 그 프로필을 선택하고, 명시하지 않으면 `default_environment` 프로필을 선택한다. 선택 후 `env_path`를 적용해 얻은 `$SOURCE_BASE`가 사용자가 지정한 대상 경로와 맞지 않으면 다른 프로필을 추측하지 말고 사용자에게 확인한다.
 - 이하의 `{{key}}` 표기는 선택한 환경 프로필의 같은 이름을 가진 키 값으로 치환한다. `{{manual_base}}`처럼 프로필에 없는 공통 키는 설정의 최상위 키에서 찾는다. 실제 명령을 실행할 때는 현재 셸에 맞게 값을 인용한다.
 - 로컬 설정에는 다음 공통 키가 필요하다.
@@ -29,24 +29,34 @@
 
   | 키 | 의미 | 값이 사용되는 위치 |
   | --- | --- | --- |
-  | `type` | `local` 또는 `ssh_container` | 에이전트가 실행되는 로컬 호스트 |
+  | `type` | `local`, `remote` 또는 `remote_container` | 에이전트가 실행되는 로컬 호스트 |
   | `env_path` | 빌드·테스트에 필요한 환경 변수를 설정하는 환경 파일 | 선택한 작업 환경 |
 
-- `ssh_container` 프로필에는 다음 키가 추가로 필요하다.
+- `remote`와 `remote_container` 프로필에는 다음 키가 추가로 필요하다.
+
+  | 키 | 의미 | 값이 사용되는 위치 |
+  | --- | --- | --- |
+  | `ssh_address` | `user@host` 형식의 SSH 접속 대상 | 에이전트가 실행되는 로컬 호스트 |
+  | `tibero_connect_string` | `tbsql` 접속 문자열 | 선택한 원격 작업 환경 |
+
+- `remote`와 `remote_container` 프로필에는 다음 SSH 인증 키 중 하나 이상이 필요하다.
 
   | 키 | 의미 | 값이 사용되는 위치 |
   | --- | --- | --- |
   | `ssh_private_key` | SSH 개인키 파일 경로 | 에이전트가 실행되는 로컬 호스트 |
-  | `ssh_address` | `user@host` 형식의 SSH 접속 대상 | 에이전트가 실행되는 로컬 호스트 |
-  | `of_container_name` | OpenFrame 개발 Docker 컨테이너 이름 | SSH 대상 호스트 |
-  | `tibero_connect_string` | `tbsql` 접속 문자열 | 컨테이너 |
+  | `ssh_password` | SSH 또는 필요한 대화형 `sudo` 인증에 사용할 비밀번호 | SSH 대상 호스트의 인증 프롬프트 |
+
+- `ssh_private_key`와 `ssh_password`가 모두 있으면 SSH 접속에는 `ssh_private_key`만 사용하고, `ssh_password`는 `sudo` 등 원격 호스트가 추가로 비밀번호를 요구하는 대화형 인증에만 사용한다. 키 인증이 실패해도 같은 프로필의 비밀번호로 자동 재시도하지 않는다.
+- `ssh_password`만 있으면 비밀번호로 SSH에 접속한다. 비밀번호를 명령 인자, URL, 환경 변수, 임시 파일, 로그 또는 사용자 보고에 넣지 않고 인증 프롬프트에만 입력한다.
+
+- `remote_container` 프로필에는 OpenFrame 개발 Docker 컨테이너 이름을 지정하는 `of_container_name`이 추가로 필요하다. `remote` 프로필에는 이 키를 두지 않는다.
 
 - `env_path`는 모든 환경 프로필에 필수다. 소스 루트와 OpenFrame 설치 루트는 로컬 설정에 중복 기록하지 않고, 이 환경 파일을 적용한 뒤 각각 `$SOURCE_BASE`와 `$OPENFRAME_HOME`에서 읽는다.
 - `local` 프로필에서 Tibero 접속이 필요한 작업을 수행할 수 있다면 `tibero_connect_string`을 선택적으로 정의한다. 정의되지 않은 기능이 작업에 꼭 필요하면 값을 추측하지 말고 사용자에게 요청한다.
-- 설정 파일이나 선택한 프로필에 필요한 키가 없으면 값을 추측하지 말고 사용자에게 요청한다. 개인키 내용은 요청하지 않고 `ssh_private_key` 경로만 입력받는다.
-- 각 값은 처음 사용하기 전에 해당 실행 위치에서 검증한다. 특히 매뉴얼 경로와 `env_path` 파일이 실제로 존재하는지 확인하고, `ssh_container` 프로필에서는 개인키 파일과 컨테이너도 확인한다.
+- 설정 파일이나 선택한 프로필에 필요한 키가 없으면 값을 추측하지 말고 사용자에게 요청한다. SSH 인증 정보가 없으면 개인키 내용 대신 `ssh_private_key` 경로 또는 `ssh_password` 중 하나를 요청한다.
+- 각 값은 처음 사용하기 전에 해당 실행 위치에서 검증한다. 특히 매뉴얼 경로와 `env_path` 파일이 실제로 존재하는지 확인한다. `remote`와 `remote_container` 프로필에서 `ssh_private_key`를 선택했다면 개인키 파일과 키 인증을 확인하고, `ssh_password`만 선택했다면 비밀번호 인증을 확인한다. `remote_container`에서는 컨테이너도 확인한다.
 - 선택한 작업 환경에 진입하면 다른 작업보다 먼저 `env_path`를 현재 셸에 맞는 방식으로 적용한다. 환경 파일은 신뢰된 로컬 셸 코드로 취급하며 내용을 불필요하게 출력하지 않는다. 적용 후 `$SOURCE_BASE`와 `$OPENFRAME_HOME`이 모두 비어 있지 않고 각각 실제 디렉터리를 가리키는지 확인한다.
-- 환경 파일 적용 결과는 셸 프로세스마다 유지된다. 새 셸을 열거나 별도의 `docker exec`로 명령을 실행할 때마다 같은 명령 안에서 `env_path`를 다시 적용한 뒤 작업한다.
+- 환경 파일 적용 결과는 셸 프로세스마다 유지된다. 새 셸을 열거나 별도의 SSH 원격 명령 또는 `docker exec`를 실행할 때마다 같은 명령 안에서 `env_path`를 다시 적용한 뒤 작업한다.
 - OpenFrame 노드 이름은 로컬 설정에 두지 않고 선택한 환경에 설정된 `$OPENFRAME_NODENAME`을 사용한다. 관련 명령을 실행하기 전에 이 값이 비어 있지 않은지 확인한다.
 - 접속 문자열 등 민감할 수 있는 값은 불필요하게 화면이나 작업 보고에 출력하지 않는다.
 
@@ -101,13 +111,47 @@ PowerShell 환경 파일이면 `Test-Path`로 확인하고 dot-source한 뒤 `$e
 
 파일 수정, 빌드, 테스트, 로그 확인은 모두 이 로컬 환경에서 수행한다.
 
-### SSH 컨테이너 환경
+### SSH 원격 환경
 
-`type: ssh_container`이면 다음 순서로 진입한다.
+`type: remote`이면 다음 순서로 진입한다.
 
-1. VM에 SSH로 접속한다.
+1. VM에 SSH로 접속한다. `ssh_private_key`가 있으면 다음처럼 키 인증을 사용한다.
    ```text
    ssh -i "{{ssh_private_key}}" "{{ssh_address}}"
+   ```
+
+   `ssh_password`만 있으면 다음 명령을 실행하고 비밀번호 프롬프트에 값을 입력한다.
+   ```text
+   ssh "{{ssh_address}}"
+   ```
+
+2. SSH 대상 서버에서 환경 파일을 적용하고 OpenFrame 설치 루트를 검증한다.
+   ```sh
+   test -f "{{env_path}}"
+   . "{{env_path}}"
+   test -d "${SOURCE_BASE:?SOURCE_BASE is not set}"
+   test -d "${OPENFRAME_HOME:?OPENFRAME_HOME is not set}"
+   ```
+
+3. 같은 셸에서 소스 루트로 이동한다.
+   ```sh
+   cd "$SOURCE_BASE"
+   ```
+
+컨테이너에 진입하거나 `docker exec`를 사용하지 않는다. 비대화형 SSH 명령을 별도로 실행할 때는 각 호출에서 `env_path` 적용, 검증, 작업 명령을 하나의 원격 셸 실행으로 묶는다.
+
+### SSH 컨테이너 환경
+
+`type: remote_container`이면 다음 순서로 진입한다.
+
+1. VM에 SSH로 접속한다. `ssh_private_key`가 있으면 다음처럼 키 인증을 사용한다.
+   ```text
+   ssh -i "{{ssh_private_key}}" "{{ssh_address}}"
+   ```
+
+   `ssh_password`만 있으면 다음 명령을 실행하고 비밀번호 프롬프트에 값을 입력한다.
+   ```text
+   ssh "{{ssh_address}}"
    ```
 
 2. SSH 접속 후 Docker 컨테이너에 들어간다.
@@ -153,7 +197,7 @@ PowerShell 환경 파일이면 `Test-Path`로 확인하고 dot-source한 뒤 `$e
 - 오류 코드에 대한 상세 설명은 `oferror 에러코드` 커맨드로 조회한다.
 
 ## 작업 원칙
-- 모든 파일 수정, 빌드, 테스트는 반드시 선택한 환경의 `env_path`를 먼저 적용한 같은 셸에서 `$SOURCE_BASE`로 이동해 수행한다. `local` 프로필은 로컬 호스트에서, `ssh_container` 프로필은 해당 컨테이너 안에서 수행한다.
+- 모든 파일 수정, 빌드, 테스트는 반드시 선택한 환경의 `env_path`를 먼저 적용한 같은 셸에서 `$SOURCE_BASE`로 이동해 수행한다. `local` 프로필은 로컬 호스트에서, `remote` 프로필은 SSH 대상 서버에서, `remote_container` 프로필은 해당 컨테이너 안에서 수행한다.
 - 현재 위치가 애매하면 현재 셸에 맞는 명령으로 작업 경로와 디렉터리 내용을 먼저 확인한 뒤 진행한다.
 - 경로를 추측하지 말고, 실제 존재를 확인한 후에만 명령을 실행한다.
 - 수정한 범위와 직접 관련된 빌드와 테스트를 우선 수행한다.

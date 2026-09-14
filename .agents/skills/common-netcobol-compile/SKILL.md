@@ -9,7 +9,7 @@ description: 후지쯔 사양 COBOL 테스트 프로그램을 ofcbppf로 전처�
 
 ## 사전 확인
 
-1. 루트 `AGENTS.md`와 `.agents/openframe.local.yaml`에서 선택한 환경 프로필로 진입하고, 환경 파일에서 읽은 `$SOURCE_BASE`에서 작업한다.
+1. 루트 `AGENTS.md`와 `.agents/openframe.local.yaml`에서 선택한 환경 프로필로 진입하고, 환경 파일에서 읽은 `$SOURCE_BASE`에서 작업한다. `type: remote`이면 SSH 서버에서 직접 작업하며 컨테이너에 진입하지 않고, `type: remote_container`일 때만 지정된 컨테이너에서 작업한다. 원격 인증은 `ssh_private_key`를 우선하며, 이 값이 없을 때만 `ssh_password`로 접속한다. 둘 다 있으면 비밀번호는 필요한 `sudo` 인증에만 사용하고 노출하거나 명령에 삽입하지 않는다.
 2. 소스 파일, copybook, `PROGRAM-ID`, COBOL `SELECT`의 DD 이름, JCL의 프로그램명·DD·`PRGLIB`를 대조한다.
 3. 도구와 환경을 확인한다.
 

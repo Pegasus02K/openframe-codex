@@ -14,9 +14,21 @@ environments:
     # tibero_connect_string: "user/password"
 
   remote:
-    type: "ssh_container"
+    type: "remote"
     env_path: "/path/to/openframe/environment-file"
-    ssh_private_key: "C:/path/to/private-key.pem"
     ssh_address: "user@example-host"
+    # Set one or both. When both exist, the key is used for SSH and the
+    # password is reserved for interactive authentication such as sudo.
+    ssh_private_key: "C:/path/to/private-key.pem"
+    ssh_password: "password"
+    tibero_connect_string: "user/password"
+
+  remote_container:
+    type: "remote_container"
+    env_path: "/path/to/openframe/environment-file"
+    ssh_address: "user@example-host"
+    # Set one or both, using the same precedence as the remote profile.
+    ssh_private_key: "C:/path/to/private-key.pem"
+    ssh_password: "password"
     of_container_name: "openframe-container"
     tibero_connect_string: "user/password"

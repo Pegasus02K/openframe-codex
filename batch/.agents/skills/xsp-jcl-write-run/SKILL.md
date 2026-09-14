@@ -9,7 +9,7 @@ description: OpenFrame의 BATCH_OS_TYPE을 확인해 XSP 환경에서만 Fujitsu
 
 ## 필수 경계
 
-1. 루트 `AGENTS.md`와 `.agents/openframe.local.yaml`에서 환경 프로필을 선택하고 해당 `env_path`를 적용한다.
+1. 루트 `AGENTS.md`와 `.agents/openframe.local.yaml`에서 환경 프로필을 선택하고 해당 `env_path`를 적용한다. `type: remote`이면 SSH 서버에서 직접 작업하며 컨테이너에 진입하지 않고, `type: remote_container`일 때만 지정된 컨테이너에서 작업한다. 원격 인증은 `ssh_private_key`를 우선하며, 이 값이 없을 때만 `ssh_password`로 접속한다. 둘 다 있으면 비밀번호는 필요한 `sudo` 인증에만 사용하고 노출하거나 명령에 삽입하지 않는다.
 2. `$OPENFRAME_NODENAME`, `$SOURCE_BASE`, `$OPENFRAME_HOME`, `ofconfig`, `tjesmgr`를 확인한다.
 3. 다음 상세 조회의 `VALUE`가 정확히 `XSP`일 때만 계속한다.
 

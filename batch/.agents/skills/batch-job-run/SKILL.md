@@ -9,7 +9,7 @@ JCL을 올바른 `SYS1.JCLLIB`에 배치하고 `tjesmgr`로 제출한 뒤 JOB �
 
 ## 사전 확인
 
-1. 루트 `AGENTS.md`와 `.agents/openframe.local.yaml`에서 작업 대상에 맞는 환경 프로필을 선택하고, 환경 파일에서 읽은 `$SOURCE_BASE`에서 작업한다.
+1. 루트 `AGENTS.md`와 `.agents/openframe.local.yaml`에서 작업 대상에 맞는 환경 프로필을 선택하고, 환경 파일에서 읽은 `$SOURCE_BASE`에서 작업한다. `type: remote`이면 SSH 서버에서 직접 작업하며 컨테이너에 진입하지 않고, `type: remote_container`일 때만 지정된 컨테이너에서 작업한다. 원격 인증은 `ssh_private_key`를 우선하며, 이 값이 없을 때만 `ssh_password`로 접속한다. 둘 다 있으면 비밀번호는 필요한 `sudo` 인증에만 사용하고 노출하거나 명령에 삽입하지 않는다.
 2. 실행할 JCL 파일과 멤버 이름을 확인한다. JCL이 호출하는 프로그램, 프로그램 라이브러리, 입력 데이터셋이 준비되어 있는지 확인한다.
 3. 환경과 서비스 상태를 확인한다.
 
