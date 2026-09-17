@@ -1,5 +1,5 @@
 ---
-name: xsp-jcl-write-run
+name: jcl-write-run-xsp
 description: OpenFrame의 BATCH_OS_TYPE을 확인해 XSP 환경에서만 Fujitsu 형식 XSP JCL을 작성하고, 기존 batch-job-run 절차로 제출한 뒤 JOB 상태, STEP RC, SPOOL과 요청된 업무 결과를 검증한다. XSP용 JOB, EX, FD, SYSIN/DATA/JEND 문 작성, MVS 형식 JCL의 XSP 변환, XSP 배치 테스트 JCL 생성·실행 또는 XSP JCL 문법 오류 수정이 필요할 때 사용한다.
 ---
 
@@ -19,7 +19,7 @@ ofconfig list -n "$node_name" -k BATCH_OS_TYPE -l
 ```
 
 - 노드 이름을 `NODE1`로 고정하지 않는다.
-- 값이 `MVS`, `MSP`, `VOS3`이거나 조회가 실패하면 JCL을 작성하거나 제출하지 않는다. 확인된 값과 필요한 해당 OS 스킬을 보고한다.
+- 값이 `MVS`, `MSP`, `VOS3`이면 `$jcl-write-run-general`로 라우팅한다. XSP를 명시한 요청과 현재 환경이 다르면 대상 환경을 확인한다. 조회가 실패하면 작성·제출을 중단하고 원인을 확인한다.
 - 설정을 바꾸어 XSP 테스트를 만들지 않는다.
 - 실제 제출과 결과 확인에는 반드시 `$batch-job-run`을 함께 사용한다.
 

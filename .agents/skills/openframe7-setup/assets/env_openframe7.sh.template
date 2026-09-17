@@ -1,0 +1,83 @@
+# Render every @...@ marker before sourcing; no DB password belongs here.
+export OPENFRAME_NODENAME='@NODE_NAME@'
+export OPENFRAME_INSTANCE_NAME='@INSTANCE_NAME@'
+
+export LD_LIBRARY_PATH=/lib64:/usr/lib64:./
+export PATH=/bin:/usr/bin:/usr/local/bin:/usr/local/sbin:/usr/sbin:/sbin:$HOME/bin
+
+# OF Cobol
+export OFCOB_HOME=@OFCOB_HOME@
+export PATH=$PATH:$OFCOB_HOME/bin
+export LD_LIBRARY_PATH=$OFCOB_HOME/lib:$LD_LIBRARY_PATH
+export COBPARSER_HOME=$OFCOB_HOME/cobolparser
+export PATH=$PATH:$COBPARSER_HOME/bin
+export LD_LIBRARY_PATH=$COBPARSER_HOME/lib:$LD_LIBRARY_PATH
+
+export LLVM_HOME=@LLVM_HOME@
+export PATH=$LLVM_HOME/bin:$PATH
+export LD_LIBRARY_PATH=$LLVM_HOME/lib:$LD_LIBRARY_PATH
+
+# OpenFrame
+export SOURCE_BASE=$HOME/@SOURCE_DIRECTORY_NAME@
+export OPENFRAME_BIT=64
+export OPENFRAME_HOME=$HOME/@INSTALL_DIRECTORY_NAME@
+export PATH=$PATH:$OPENFRAME_HOME/bin:$OPENFRAME_HOME/util
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$OPENFRAME_HOME/lib
+
+export EDITOR=vim
+
+# Tmax
+export TMAXDIR=$OPENFRAME_HOME/tmax
+export TMAX_HOST_ADDR=@TMAX_HOST@
+export TMAX_HOST_PORT=@TMAX_PORT@
+export FDLFILE=$TMAXDIR/fdl/oframe.fdl
+export PATH=$PATH:$TMAXDIR/bin:$TMAXDIR/bin64:$TMAXDIR/appbin
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$TMAXDIR/lib64
+
+#unixODBC
+export ODBCINI=$HOME/odbc.ini
+export ODBCSYSINI=$HOME
+
+# Database
+export TB_HOME=@TB_HOME@
+export TB_SID=@DB_ALIAS@
+export TB_USERID=@DB_USER@
+unset ORACLE_SID
+unset ORACLE_HOME
+unset ORACLE_BASE
+unset ORACLE_DOC
+unset ORA_NLS33
+export PATH=$PATH:$TB_HOME/client/bin:$TB_HOME/bin
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$TB_HOME/lib:$TB_HOME/client/lib
+export TBCLI_WCHAR_TYPE=UCS2
+
+export CPM_FILE_DIR=$OPENFRAME_HOME/cpm
+export TB_ASC_TO_EBC=ASCEBCJP.cpm
+export TB_EBC_TO_ASC=EBCASCJP.cpm
+
+# Sort
+export PROSORT_SID=PROSORT
+export PROSORT_HOME=@PROSORT_HOME@
+export WORK_HOME=$PROSORT_HOME
+unset SYNCSORT_DIR
+unset BSORT_HOME
+export PATH=$PATH:$PROSORT_HOME/bin:$PROSORT_HOME/tools/bin
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$PROSORT_HOME/lib
+
+## TCACHE Configuration ##
+export TCACHE_HOME=$OPENFRAME_HOME/tcache
+export LD_LIBRARY_PATH=$TCACHE_HOME/lib:$LD_LIBRARY_PATH
+export PATH=$PATH:$TCACHE_HOME/bin
+export TCACHECONF=$OPENFRAME_HOME/config/pfmtcache.cfg
+export PFM_ADM_LOG_DIR=$TCACHE_HOME/log
+
+# OFASM
+export OFASM_HOME=@OFASM_HOME@
+export PATH=$OFASM_HOME/bin:$PATH
+export LD_LIBRARY_PATH=$OFASM_HOME/lib:$LD_LIBRARY_PATH
+export OFASM_MACLIB=${OFASM_HOME}/maclib/ofmac:${HOME}/ofasm/maclib/38mac:${HOME}/ofasm/maclib/fumac
+
+# Quick
+export SRC=$SOURCE_BASE
+export OH=$OPENFRAME_HOME
+export TM=$TMAXDIR

@@ -73,6 +73,7 @@ $ tjesmgr
 - `podd`는 같은 세션에서 `psjob` 또는 `pospool`을 먼저 실행한 후 사용한다.
 - `di`는 `PSJOB`/`POSPOOL`의 SPOOL LIST에 표시된 `NO` 즉 DD index이다. EXEC STEP 순번과 혼동하지 않는다.
 - 환경의 `@J` 현재 JOB 별칭이 동작하지 않으면 `podd JOB000n di=<dd-index>`를 사용한다. DD 이름으로 확인할 때는 `dn=<dd-name>`을 사용한다.
+- `PODD`가 `vi` 같은 별도 뷰어를 열면 출력 확인 후 먼저 뷰어를 종료하고 다음 TJES 명령을 보낸다. `vi`에서는 `Esc`, `:q!`, Enter로 저장 없이 종료한다. 뷰어가 열린 상태에서 다음 `PSJOB`/`PODD`를 입력하지 않는다. 일반 파이프 입력은 PTY 요구로 실패할 수 있고, 독립적인 `tjesmgr podd ...`는 콘솔 전용 오류가 날 수 있다.
 
 `DONE`은 JCL이 허용한 RC 범위에서 종료되었다는 뜻일 뿐 업무 결과의 성공을 보장하지 않는다. 반드시 STEP RC와 기대한 DISPLAY, 레코드, 오류 메시지가 담긴 SPOOL을 함께 확인한다.
 
@@ -87,6 +88,7 @@ $ tjesmgr
 
 명령이 불확실하면 다음 매뉴얼을 다시 확인한다.
 
-- `{{manual_base}}/openframe_batch/docs/modules/xsp-tjes-guide/pages/chapter-tjesmgr-commands.adoc`
-- `{{manual_base}}/openframe_batch/docs/modules/xsp-tjes-guide/pages/chapter-job-management.adoc`
+- 현재 `BATCH_OS_TYPE`에 따라 MVS는 `tjes-guide`, MSP는 `msp-tjes-guide`, VOS3는 `vos-tjes-guide`, XSP는 `xsp-tjes-guide`를 선택한다.
+- `{{manual_base}}/openframe_batch/docs/modules/<선택한 TJES 모듈>/pages/chapter-tjesmgr-commands.adoc`
+- `{{manual_base}}/openframe_batch/docs/modules/<선택한 TJES 모듈>/pages/chapter-job-management.adoc`
 - `{{manual_base}}/openframe_batch/docs/modules/batch-installation-guide/pages/chapter-verifying-installation.adoc`

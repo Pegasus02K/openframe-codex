@@ -87,7 +87,10 @@
 사용자가 OpenFrame Batch 테스트 JCL 제출·실행, JOB 상태·STEP RC·SPOOL 결과 검증 또는 배치 실패 원인 조사를 요청하면 `batch-job-run` 스킬을 사용한다.
 
 ### XSP JCL 작성 및 실행 스킬
-사용자가 XSP JCL 작성, MVS 형식 JCL의 XSP 변환, XSP JCL 문법 오류 수정 또는 작성한 XSP JCL의 실제 실행 검증을 요청하면 `xsp-jcl-write-run` 스킬을 사용한다. 실제 제출·실행이 포함되면 `batch-job-run` 스킬도 함께 사용한다.
+사용자가 XSP JCL 작성, MVS 형식 JCL의 XSP 변환, XSP JCL 문법 오류 수정 또는 작성한 XSP JCL의 실제 실행 검증을 요청하면 `jcl-write-run-xsp` 스킬을 사용한다. 실제 제출·실행이 포함되면 `batch-job-run` 스킬도 함께 사용한다.
+
+### MVS·MSP·VOS3 JCL 작성 및 실행 스킬
+사용자가 MVS, MSP 또는 VOS3 JCL 작성, 문법 오류 수정 또는 작성한 JCL의 실제 실행 검증을 요청하면 `jcl-write-run-general` 스킬을 사용한다. 세 OS의 기본 문법은 하나의 스킬에서 관리하고, OS별 특수 기능이 필요한 경우 해당 OS 매뉴얼과 지원 여부를 먼저 확인한다. 실제 제출·실행이 포함되면 `batch-job-run` 스킬도 함께 사용한다.
 
 ### OpenFrame 설정 관리 스킬
 사용자가 OpenFrame 설정 조회, 상세 정보·허용 범위 확인, 테스트를 위한 가역적 임시 변경 또는 원래 값 복원을 요청하면 `common-ofconfig-manage` 스킬을 사용한다.
@@ -197,6 +200,7 @@ PowerShell 환경 파일이면 `Test-Path`로 확인하고 dot-source한 뒤 `$e
 - 오류 코드에 대한 상세 설명은 `oferror 에러코드` 커맨드로 조회한다.
 
 ## 작업 원칙
+- 작업 대상이 Git 저장소이면 본 작업 전에 현재 브랜치와 작업 트리 상태를 확인하고, 기존 변경을 보존한 채 `git pull --ff-only`를 반드시 먼저 시도한다. pull에 실패하면 원인과 원격 변경 반영 여부를 확인해 보고하며, 임의로 병합하거나 변경을 되돌리지 않는다.
 - 모든 파일 수정, 빌드, 테스트는 반드시 선택한 환경의 `env_path`를 먼저 적용한 같은 셸에서 `$SOURCE_BASE`로 이동해 수행한다. `local` 프로필은 로컬 호스트에서, `remote` 프로필은 SSH 대상 서버에서, `remote_container` 프로필은 해당 컨테이너 안에서 수행한다.
 - 현재 위치가 애매하면 현재 셸에 맞는 명령으로 작업 경로와 디렉터리 내용을 먼저 확인한 뒤 진행한다.
 - 경로를 추측하지 말고, 실제 존재를 확인한 후에만 명령을 실행한다.
