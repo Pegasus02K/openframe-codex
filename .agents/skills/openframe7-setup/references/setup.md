@@ -94,7 +94,7 @@ OPENFRAME_HOME/scripts의 .sample을 활성 파일로 복사해 환경에 맞춘
 ## 실제 성공 테스트
 
 1. 충돌 없는 테스트 dataset을 dscreate로 만들고 dslist/listcat으로 확인한다. spfedit의 지원 모드로 내용을 확인하고 dsdelete로 삭제한 뒤 카탈로그 제거를 확인한다. 사용자 보존 요청이 있으면 영구 보존용 결과 dataset과 삭제 검증용 dataset을 구분한다.
-2. jcl-write-run 계열 및 batch-job-run에 따라 최소 유틸리티 JOB을 제출한다. MVS/VOS3는 실제 설치명을 확인해 IEFBR14를 사용하고, MSP rb_73 실측은 `$OPENFRAME_HOME/util/KDJBR14`가 설치되므로 `PGM=KDJBR14`를 사용한다. MSP에서 `PGM=IEFBR14`는 빌드 트리에 파일이 있어도 설치 실행 파일을 찾지 못해 A0016으로 실패했다. JOB ID, 최종 상태, 해당 OS/버전의 정상 STEP RC, JESMSG 등 출력 DD를 확인한다. XSP와 MSP 실측 실행 래퍼는 정상 애플리케이션 RC 0을 JOB/STEP RC 10으로 표시하므로 0을 일괄 강제하지 않는다.
+2. jcl-write-run 계열 및 batch-job-run에 따라 최소 유틸리티 JOB을 제출한다. 실제 설치명을 확인한다. MVS는 IEFBR14, VOS3는 JDJDUMMY(7.4 실측), MSP rb_73 실측은 `$OPENFRAME_HOME/util/KDJBR14`가 설치되므로 `PGM=KDJBR14`를 사용한다. MSP에서 `PGM=IEFBR14`는 빌드 트리에 파일이 있어도 설치 실행 파일을 찾지 못해 A0016으로 실패했다. JOB ID, 최종 상태, 해당 OS/버전의 정상 STEP RC, JESMSG 등 출력 DD를 확인한다. XSP와 MSP 실측 실행 래퍼는 정상 애플리케이션 RC 0을 JOB/STEP RC 10으로 표시하므로 0을 일괄 강제하지 않는다.
 3. base/src/ds/tsam/test/create.sh을 읽고 TEST.* 삭제/생성 범위를 확인한다. 현재 Makefile에 copybook target이 있으면 `make copybook`으로 설치 tsam/copybook에 먼저 배치한다. 신규 스키마와 테스트 경로에서 create.sh를 실행하고 해당 OS의 make target으로 컴파일한다. 실측 target은 mvs/msp/xsp/vos이다. 초기 DELETE의 대상 없음은 허용하되 최종 DEFINE/LIBGEN 성공을 각각 확인한다.
 4. 쓰기→읽기 순서와 AIX/PATH, VB 테스트의 입력 의존성을 JCL에서 확인한다. 각각 JOB/STEP/SPOOL와 실제 레코드·카탈로그를 확인한다. DONE만으로 성공 판정하지 않는다. XSP의 OSAMFRUN에서는 애플리케이션 RC 0이 JOB/STEP RC 10으로 표시될 수 있다. 실제 SPOOL의 `Execution AP(...) done - RC(0), STATUS(R)`와 정상 종료, 오류 부재를 함께 확인한다. 상태/RC를 기대값으로 하드코딩해 결과 파일에 쓰지 말고 실제 출력에서 추출한다. 실패 시 자동 연속 제출을 멈추고 미실행 항목을 따로 기록한다.
 5. 환경 파일, 소스, 설치본, 로그와 JCL/SPOOL을 보존하고 실패한 테스트를 구분해 보고한다.
@@ -105,7 +105,7 @@ OPENFRAME_HOME/scripts의 .sample을 활성 파일로 복사해 환경에 맞춘
 
 PTY UI가 TERM=dumb에서 보이지 않으면 해당 세션에 TERM=xterm을 지정한다. spfedit은 `-b`로 실제 레코드를 확인하고 F3으로 종료한다.
 
-XSP `make xsp`는 `TSAM.TEST.WRITEX`, `KREADX`, `EREADX`, `PATHX`, `KAIXX`, `EAIXX`, `WRITEVBX`, `READVBX`, `WRITEVBX2`, `READVBX2` 멤버를 배치한다(모두 `TSAM.TEST.` 접두사). MVS 멤버명을 그대로 제출하지 않는다. `create.sh`는 초기 DELETE의 미존재 오류를 허용하므로 스크립트 종료 코드 외에 각 DEFINE/LIBGEN 결과와 카탈로그도 확인한다.
+XSP `make xsp`는 `TSAM.TEST.WRITEX`, `KREADX`, `EREADX`, `PATHX`, `KAIXX`, `EAIXX`, `WRITEVBX`, `READVBX`, `WRITEVBX2`, `READVBX2` 멤버를 배치한다(모두 `TSAM.TEST.` 접두사). MVS 멤버명을 그대로 제출하지 않는다. WRITEVBX2/READVBX2의 마지막 qualifier는 9자여서 7.4 tjesmgr r에서 거부됐다. 원본을 보존하고 동일 내용을 TSAM.TEST.WVBX2/TSAM.TEST.RVBX2로 복사하여 제출하면 통과했다. 상세 실측은 [7.4 비 MVS 검증](validation-74-non-mvs.md)을 참고한다. `create.sh`는 초기 DELETE의 미존재 오류를 허용하므로 스크립트 종료 코드 외에 각 DEFINE/LIBGEN 결과와 카탈로그도 확인한다.
 
 ### MVS HiDB 정상 동작 테스트
 

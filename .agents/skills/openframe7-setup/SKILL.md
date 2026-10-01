@@ -18,7 +18,7 @@ BATCH OS는 명시적인 사용자 지시 또는 프로필 `os`로 선택한다.
 
 ## 설치와 검증
 
-[설치 상세 절차](references/setup.md)를 순서대로 수행한다. 7.4이면 먼저 [7.4 설치 차이와 실측 기록](references/validation-74.md)을 읽는다. 기존 HOME 환경 파일을 개별 서브셸에서 적용해 포트, Tmax SHMKEY, TCache SHMKEY와 경로를 비교한다. 서버 기동 전 `openframe_base.conf`의 `ds.DATASET_RESOURCE.DATASET_SHMKEY`도 시스템에서 참조 가능한 다른 키와 겹치지 않는 값으로 바꾼다. ss/ipcs의 현재 사용량도 확인한다. 꺼진 환경의 설정값도 충돌 대상이며, ipcs의 16진수와 설정의 10진수 키를 정수로 정규화해 비교한다. Tmax가 연속 키를 사용하는 범위도 확인한다.
+[설치 상세 절차](references/setup.md)를 순서대로 수행한다. 7.4이면 먼저 [7.4 설치 차이와 실측 기록](references/validation-74.md)을 읽는다. 7.4 MSP/XSP/VOS3이면 [해당 OS의 빌드 결과와 실행 검증 상태](references/validation-74-non-mvs.md)도 확인한다. 기존 HOME 환경 파일을 개별 서브셸에서 적용해 포트, Tmax SHMKEY, TCache SHMKEY와 경로를 비교한다. 서버 기동 전 `openframe_base.conf`의 `ds.DATASET_RESOURCE.DATASET_SHMKEY`도 시스템에서 참조 가능한 다른 키와 겹치지 않는 값으로 바꾼다. ss/ipcs의 현재 사용량도 확인한다. 꺼진 환경의 설정값도 충돌 대상이며, ipcs의 16진수와 설정의 10진수 키를 정수로 정규화해 비교한다. Tmax가 연속 키를 사용하는 범위도 확인한다.
 
 DB 접속값/ENPASSWD는 출력하지 않는다. 설치 config와 로그의 권한을 제한한다. 초기 import는 신규 설치의 명시적 작업이며, 기존 환경의 일시 설정 변경에는 `common-ofconfig-manage`의 원본 확보·복원 절차를 적용한다.
 

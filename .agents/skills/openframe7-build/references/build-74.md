@@ -34,3 +34,10 @@ Oracle 참고 환경은 옵션과 구조의 참고 자료다. Tibero 선택 시 
 - Tmax tar에는 lib64만 있었으므로 신규 TMAXDIR에 `lib -> lib64` 링크가 필요했다. license/log 디렉터리도 실제 배포본을 확인해 생성한다.
 - OSC는 Tmax5.0SP2Fix4 헤더에 TDL_RTLD_GLOBAL이 없어 실패했다. 사용자 지시로 제외했으며 제품 코드를 수정하지 않았다. OSI는 빌드·설치에 성공했다.
 - 최종 루트 `make all OS=mvs COMPONENTS="base batch tacf ims osi"` 성공. Base/Batch/TACF/HiDB/OSI 설치 성공. 실행 검증 범위는 [7.4 설치 실측](../../openframe7-setup/references/validation-74.md)을 따른다.
+
+## rc1 MSP/XSP/VOS3 빌드에서 확인한 추가 보완
+
+- `--set`이 생성 config.local의 활성 값에 반영되었는지 확인한다. rc1의 Base/Batch에는 TIBERO_VERSION 활성 줄이 없고 NDB COBOL_COMPILER는 토큰이 아닌 NETCOBOL 값이어서 옵션 전달만으로 원하는 설정이 되지 않았다. 신규 로컬 파일에 Tibero 7/OFCOBOL 값을 보완한 후 최종 빌드를 다시 수행한다.
+- DB 드라이버는 설치된 libtdbconnsw.so의 실제 링크 대상으로 확인한다. 라이브러리는 `.so.64.7_4_0_0_0` 같은 버전 접미사를 사용하므로 고정 `.so` 파일명만 검사하지 않는다.
+- dev/make/rules.tool은 파일 target에도 설치 복사를 포함하며 기본 INSTALL_DIR은 HOME/bin이다. 기존 공용 도구를 보존하려면 `make -C dev/tool/oflicgen INSTALL_DIR="$OPENFRAME_HOME/bin"`으로 설치 경로를 지정한다. 실제 세 환경에서 이 변수 지정 후 재빌드하여 복사 경로와 기존 MVS 바이너리 보존을 확인했다. 파일 target 선택이나 BIN_DIR 지정만으로 설치 복사가 생략된다고 가정하지 않는다.
+- OS별 최종 빌드·전처리·링크 검사와 실행 검증 결과와 미검증 범위는 [7.4 MSP/XSP/VOS3 실측](../../openframe7-setup/references/validation-74-non-mvs.md)을 참고한다.
