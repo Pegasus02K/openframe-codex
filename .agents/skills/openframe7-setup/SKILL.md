@@ -5,20 +5,20 @@ description: OpenFrame 7의 신규 설치 환경 파일과 Tmax/TCache를 준비
 
 # OpenFrame 7 설치
 
-BATCH OS는 사용자가 지정해야 한다. 미지정이면 질문하며 예제 파일명으로 결정하지 않는다. 실제 빌드는 `openframe7-build`를 함께 사용한다. MVS 검증을 다른 OS의 설치 성공으로 일반화하지 않는다.
+BATCH OS는 명시적인 사용자 지시 또는 프로필 `os`로 선택한다. `version`과 `rdb`도 같은 프로필에서 읽는다. 필수 값이 없으면 질문하며 예제 파일명으로 결정하지 않는다. 7.3은 Tibero만, 7.4는 Tibero/Oracle을 지원한다. 실제 빌드는 `openframe7-build`를 함께 사용한다. MVS 검증을 다른 OS의 설치 성공으로 일반화하지 않는다.
 
 ## 설치 전 확인
 
 1. 저장소 AGENTS.md, `.agents/openframe.local.yaml`, 선택된 프로필의 접속 방식과 env_path를 확인한다. 모든 새 셸에서 환경 파일을 적용하고 SOURCE_BASE/OPENFRAME_HOME을 검증한 후 SOURCE_BASE로 이동한다.
 2. 신규 소스/설치 경로와 HOME의 새 환경 파일을 준비한다. [환경 템플릿](assets/env_openframe7.sh.template)은 정상 예제에서 추출한 구조이며 @...@를 실제 값으로 치환한 뒤 사용한다. 비밀번호는 템플릿이나 버전 관리 파일에 넣지 않는다.
 3. **$HOME/packages**의 Tmax/TCache/Tibero client 바이너리를 확인한다. 없으면 위치를 질문한다. ProSort/OFCOBOL, VOS3 ofcbpph를 확인한다. Tmax/OFCOBOL/ProSort 라이선스는 packages에 없으면 예제 환경에서 재사용 가능 여부를 확인하고 없으면 질문한다.
-4. `odbcinst -j`, `-q -d`, `-q -s`로 DB 드라이버/DSN을 확인하고 실제 연결을 검증한다. Tibero는 tibero_connect_string과 최신 사용자 지시를 따른다. DSN과 tbdsn.tbr 별칭도 확인한다. Oracle 정보가 없거나 연결할 수 없으면 질문한다.
+4. `odbcinst -j`, `-q -d`, `-q -s`로 DB 드라이버/DSN을 확인하고 실제 연결을 검증한다. 선택한 rdb의 rdb_connect_string과 최신 사용자 지시를 따른다. Tibero는 DSN과 tbdsn.tbr, Oracle은 DSN ServerName 및 client include/lib 경로를 확인한다. 정보가 없거나 연결할 수 없으면 질문한다. 접속값은 인자·로그에 노출하지 않고 대화형 또는 출력 없는 stdin으로 전달한다.
 5. 새 설치용 스키마가 비어 있는지 먼저 확인한다. 기존 환경의 스키마에 init/import를 실행하지 않는다. 별도 계정이 필요하면 사용자에게 요청한다. DEFVOL/100000/200000 테이블스페이스를 확인하고 없는 경우에만 생성 승인을 요청한다. DDL 예시는 `CREATE TABLESPACE "DEFVOL" DATAFILE 'DEFVOL.dbf' AUTOEXTEND ON;`이다.
 6. 필요한 패키지는 설치 전에 사용자 허가를 받는다. 현재 MVS 실측 환경에는 GCC 11, make, bison, flex, bc, Python 3, unixODBC 개발 환경 및 vendor 도구가 이미 있었으며 추가 패키지를 설치하지 않았다. 이를 모든 호스트의 완전한 의존성 목록으로 취급하지 않는다. 새로 확인한 패키지는 승인·설치·재검증 결과와 함께 기록한다.
 
 ## 설치와 검증
 
-[설치 상세 절차](references/setup.md)를 순서대로 수행한다. 기존 HOME 환경 파일을 개별 서브셸에서 적용해 포트, Tmax SHMKEY, TCache SHMKEY와 경로를 비교한다. 서버 기동 전 `openframe_base.conf`의 `ds.DATASET_RESOURCE.DATASET_SHMKEY`도 시스템에서 참조 가능한 다른 키와 겹치지 않는 값으로 바꾼다. ss/ipcs의 현재 사용량도 확인한다. 꺼진 환경의 설정값도 충돌 대상이다.
+[설치 상세 절차](references/setup.md)를 순서대로 수행한다. 7.4이면 먼저 [7.4 설치 차이와 실측 기록](references/validation-74.md)을 읽는다. 기존 HOME 환경 파일을 개별 서브셸에서 적용해 포트, Tmax SHMKEY, TCache SHMKEY와 경로를 비교한다. 서버 기동 전 `openframe_base.conf`의 `ds.DATASET_RESOURCE.DATASET_SHMKEY`도 시스템에서 참조 가능한 다른 키와 겹치지 않는 값으로 바꾼다. ss/ipcs의 현재 사용량도 확인한다. 꺼진 환경의 설정값도 충돌 대상이며, ipcs의 16진수와 설정의 10진수 키를 정수로 정규화해 비교한다. Tmax가 연속 키를 사용하는 범위도 확인한다.
 
 DB 접속값/ENPASSWD는 출력하지 않는다. 설치 config와 로그의 권한을 제한한다. 초기 import는 신규 설치의 명시적 작업이며, 기존 환경의 일시 설정 변경에는 `common-ofconfig-manage`의 원본 확보·복원 절차를 적용한다.
 

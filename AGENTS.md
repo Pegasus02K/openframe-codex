@@ -31,13 +31,16 @@
   | --- | --- | --- |
   | `type` | `local`, `remote` 또는 `remote_container` | 에이전트가 실행되는 로컬 호스트 |
   | `env_path` | 빌드·테스트에 필요한 환경 변수를 설정하는 환경 파일 | 선택한 작업 환경 |
+  | `version` | OpenFrame 제품 버전 문자열: `"7.3"` 또는 `"7.4"` (최상위 스키마 version과 구분) | 선택한 작업 환경 |
+  | `os` | BATCH OS: `MVS`, `MSP`, `XSP`, `VOS3` | 선택한 작업 환경 |
+  | `rdb` | DB 종류: `tibero` 또는 `oracle`. 7.3은 `tibero`만 지원 | 선택한 작업 환경 |
 
 - `remote`와 `remote_container` 프로필에는 다음 키가 추가로 필요하다.
 
   | 키 | 의미 | 값이 사용되는 위치 |
   | --- | --- | --- |
   | `ssh_address` | `user@host` 형식의 SSH 접속 대상 | 에이전트가 실행되는 로컬 호스트 |
-  | `tibero_connect_string` | `tbsql` 접속 문자열 | 선택한 원격 작업 환경 |
+  | `rdb_connect_string` | 선택한 rdb의 접속 문자열 (Tibero tbsql / Oracle sqlplus) | 선택한 원격 작업 환경 |
 
 - `remote`와 `remote_container` 프로필에는 다음 SSH 인증 키 중 하나 이상이 필요하다.
 
@@ -52,7 +55,9 @@
 - `remote_container` 프로필에는 OpenFrame 개발 Docker 컨테이너 이름을 지정하는 `of_container_name`이 추가로 필요하다. `remote` 프로필에는 이 키를 두지 않는다.
 
 - `env_path`는 모든 환경 프로필에 필수다. 소스 루트와 OpenFrame 설치 루트는 로컬 설정에 중복 기록하지 않고, 이 환경 파일을 적용한 뒤 각각 `$SOURCE_BASE`와 `$OPENFRAME_HOME`에서 읽는다.
-- `local` 프로필에서 Tibero 접속이 필요한 작업을 수행할 수 있다면 `tibero_connect_string`을 선택적으로 정의한다. 정의되지 않은 기능이 작업에 꼭 필요하면 값을 추측하지 말고 사용자에게 요청한다.
+- `local` 프로필에서 DB 접속이 필요한 작업을 수행할 수 있다면 `rdb_connect_string`을 정의한다. 필요한 값이 없으면 추측하지 말고 사용자에게 요청한다.
+- 제품 버전은 프로필의 `version`으로 선택한다. 최상위 `version`은 설정 스키마 버전이다. 7.3은 Tibero, 7.4는 Tibero/Oracle을 지원한다. 프로필 `os`를 기본 BATCH OS로 사용하며 명시적인 사용자 지시가 우선한다. `tibero_connect_string`은 `rdb_connect_string`으로 대체한다.
+- 7.4 소스는 `http://192.168.51.106/openframe/openframe7/ofsrc.git` 통합 저장소다. 클론 경로 자체가 `$SOURCE_BASE`이며 `ofrelease.sh`는 저장소 최상단에서 실행한다. 7.3의 제품별 저장소·release 절차와 혼용하지 않는다.
 - 설정 파일이나 선택한 프로필에 필요한 키가 없으면 값을 추측하지 말고 사용자에게 요청한다. SSH 인증 정보가 없으면 개인키 내용 대신 `ssh_private_key` 경로 또는 `ssh_password` 중 하나를 요청한다.
 - 각 값은 처음 사용하기 전에 해당 실행 위치에서 검증한다. 특히 매뉴얼 경로와 `env_path` 파일이 실제로 존재하는지 확인한다. `remote`와 `remote_container` 프로필에서 `ssh_private_key`를 선택했다면 개인키 파일과 키 인증을 확인하고, `ssh_password`만 선택했다면 비밀번호 인증을 확인한다. `remote_container`에서는 컨테이너도 확인한다.
 - 선택한 작업 환경에 진입하면 다른 작업보다 먼저 `env_path`를 현재 셸에 맞는 방식으로 적용한다. 환경 파일은 신뢰된 로컬 셸 코드로 취급하며 내용을 불필요하게 출력하지 않는다. 적용 후 `$SOURCE_BASE`와 `$OPENFRAME_HOME`이 모두 비어 있지 않고 각각 실제 디렉터리를 가리키는지 확인한다.
@@ -191,7 +196,7 @@ PowerShell 환경 파일이면 `Test-Path`로 확인하고 dot-source한 뒤 `$e
 - 제품 전체에 대한 매뉴얼은 `{{manual_base}}`의 하위 디렉터리들의 `docs`를 참고한다. 이 중 공통 설정에 대한 매뉴얼은 `{{manual_base}}/openframe_common`을 참고한다.
 - 아래 런타임 명령은 선택한 환경에 OpenFrame, Tmax, Tibero와 필요한 환경 변수가 구성된 경우 그 환경에서 실행한다. 현재 환경이 소스 체크아웃만 제공해 실행할 수 없다면 정적 검사까지 수행하고, 생략한 동적 검증과 필요한 런타임을 보고한다.
 - Tmax의 기동과 종료는 `tmboot`, `tmdown`으로 하며, 상태는 `tmadmin`으로 확인할 수 있다. `tmadmin`에서는 `quit`으로 빠져나온다.
-- `tibero_connect_string`이 선택한 프로필에 정의되어 있으면 Tibero는 `tbsql "{{tibero_connect_string}}"`로 접속해 SQL을 실행할 수 있다.
+- 선택한 프로필의 `rdb_connect_string`으로 Tibero는 `tbsql`, Oracle은 `sqlplus`를 사용한다. 암호를 명령 인자나 로그에 노출하지 않고 대화형 인증 또는 출력하지 않는 stdin으로 전달한다.
 - 각종 커맨드라인 툴 프로그램은 `base/tool`에서 빌드된다.
 - `.tbc`, `.pc` 확장자 파일을 수정한 경우 `make precomp`로 재빌드한다.
 - `make precomp`가 실패하면 원인을 수정한 뒤 반드시 다시 실행한다.

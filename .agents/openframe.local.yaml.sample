@@ -1,34 +1,50 @@
+# Configuration schema version; OpenFrame product version is set per profile.
 version: 4
 
 # Copy this file to .agents/openframe.local.yaml, then replace the example
 # values with paths and connection settings for your own environment.
 # Keep openframe.local.yaml private; do not put real credentials in this sample.
+# Per-profile properties:
+#   version: "7.3" or "7.4" (quote the product version)
+#   os: MVS, MSP, XSP, or VOS3
+#   rdb: tibero for 7.3; tibero or oracle for 7.4
+#   rdb_connect_string: selected RDB connection string (replaces tibero_connect_string)
+# For 7.4, env_path must set SOURCE_BASE to the ofsrc.git clone root.
 default_environment: "local"
 manual_base: "C:/path/to/Tmax/manual"
 
 environments:
   local:
     type: "local"
+    version: "7.3"
+    os: "MVS"
+    rdb: "tibero"
     env_path: "C:/path/to/openframe-env.ps1"
-    # Add this only when the local environment needs direct Tibero access.
-    # tibero_connect_string: "user/password"
+    # Add this only when the local environment needs direct RDB access.
+    # rdb_connect_string: "user/password"
 
   remote:
     type: "remote"
+    version: "7.4"
+    os: "MVS"
+    rdb: "tibero"
     env_path: "/path/to/openframe/environment-file"
     ssh_address: "user@example-host"
     # Set one or both. When both exist, the key is used for SSH and the
     # password is reserved for interactive authentication such as sudo.
     ssh_private_key: "C:/path/to/private-key.pem"
     ssh_password: "password"
-    tibero_connect_string: "user/password"
+    rdb_connect_string: "user/password@database-alias"
 
   remote_container:
     type: "remote_container"
+    version: "7.4"
+    os: "MVS"
+    rdb: "oracle"
     env_path: "/path/to/openframe/environment-file"
     ssh_address: "user@example-host"
     # Set one or both, using the same precedence as the remote profile.
     ssh_private_key: "C:/path/to/private-key.pem"
     ssh_password: "password"
     of_container_name: "openframe-container"
-    tibero_connect_string: "user/password"
+    rdb_connect_string: "user/password@database-alias"
