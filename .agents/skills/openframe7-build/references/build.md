@@ -69,6 +69,12 @@ Batch rb_73_FS2의 GCC 10+ 빌드는 예제처럼 cflags.local에 `CFLAGS_COMMON
 
 실측 XSP는 Base → Batch → TACF → NDB → AIM 순서로 `make install`에 성공했다. Base의 JCL 스위치는 `JCL_SWITCH_XSP='YES'`, Batch는 `BATCH_OS_TYPE='XSP'`로 선택하고 다른 OS 스위치를 함께 활성화하지 않는다. NDB/AIM은 `SORT_ENGINE_SELECT='PROSORT'`, `COBOL_COMPILER='OFCOBOL'`, NDB는 추가로 `USE_DB_SELECT='AIM_DB'`를 사용했다. 나머지 공통 옵션은 위 예제와 현재 sample을 비교한다. config.sample의 `NETCOBOL` 기본값을 그대로 두지 말고 실제 컴파일러와 맞춘다.
 
+### MSP 옵션과 순서
+
+실측 MSP도 Base → Batch → TACF → NDB → AIM 순서로 `make install`에 성공했다. Base는 `JCL_SWITCH_MSP='YES'`, Batch는 `BATCH_OS_TYPE='MSP'`를 선택한다. NDB/AIM은 XSP와 같이 `SORT_ENGINE_SELECT='PROSORT'`, `COBOL_COMPILER='OFCOBOL'`, NDB는 `USE_DB_SELECT='AIM_DB'`를 사용했다. MSP의 `make msp` TSAM target도 OFCOBOL의 `--enable-XSP`를 사용하므로 SPOOL에 `AIM OS TYPE : [XSP]`가 표시될 수 있다. 이 문자열만으로 환경을 XSP로 오판하지 말고 `ofconfig`의 `BATCH_OS_TYPE=MSP`, 빌드 target과 JCL을 함께 확인한다.
+
+MSP Batch 빌드는 MVS IEFBR14 소스를 재사용하지만 설치 실행 파일은 `$OPENFRAME_HOME/util/KDJBR14`이다. `$SOURCE_BASE/batch/build/IEFBR14`가 존재해도 설치 경로에 IEFBR14가 생긴다고 가정하지 않는다. MSP 최소 JOB은 `PGM=KDJBR14`로 실행한다.
+
 ## Tibero 전처리
 
 cfg 이름이 반드시 tibero.cfg인 것은 아니다. 실제 sample을 복사하고 GCC include 한 줄을 `/usr/bin/gcc -print-file-name=include`의 존재하는 절대 경로로 바꾼다. 다른 include 값은 예제와 비교해 유지한다.
@@ -85,6 +91,8 @@ cfg 이름이 반드시 tibero.cfg인 것은 아니다. 실제 sample을 복사�
 Base 루트에는 `precomp` target이 없을 수 있다. 실측 대상은 `base/src/ds/tsam`, `base/src/tdbconnsw/tdbconn_{tbr,tboci,tbodbc}`였다. NDB는 `config/tibero.cfg`를 준비한 뒤 `src/common/common`, `src/db/dml`, `src/meta`의 `make precomp`를 수행했다.
 
 NDB rb_73 실측에서는 `src/db/rstd`의 오래된 `precomp`가 없는 `ndb_rstd.pc`를 참조했다. 현재 SOURCES의 `ndb_rstd.c`가 일반 C 소스인지, 남은 `.pc`가 실제 빌드 대상인지 먼저 확인한다. 전처리할 입력이 없는 target은 미적용 사유와 실패 로그를 남기고 실제 빌드로 검증한다. 이를 전처리 성공으로 기록하거나 가짜 입력을 만들지 않는다. 필요한 입력이 누락된 경우에는 빌드를 중단하고 확인한다.
+
+TSAM용 `base/src/ds/tsam/tsam_tibero.cfg`를 준비한 뒤 설치된 `$OPENFRAME_HOME/scripts/tsam_tibero.cfg`도 같은 유효한 GCC include 설정으로 맞춘다. 소스 전처리만 성공해도 설치본의 샘플 cfg가 오래된 include를 가리키면 `idcams define`에서 `TBR-9130`/`TBR-9108`로 실패한다.
 
 ## 라이선스와 최종 Tmax 설정
 

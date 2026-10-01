@@ -14,7 +14,7 @@ MVS·MSP의 기본 제어문은 각 JCL 모듈의 `pages/jcl/`, VOS3는 `pages/o
 
 형식과 계속행은 MVS·MSP의 `pages/jcl-intro/sect-jcl-type.adoc`와 `sect-jcl-statement.adoc`, VOS3의 `pages/chapter-introduction.adoc` 및 그 include 문서를 확인한다. 제출·출력은 해당 TJES 모듈의 `pages/chapter-tjesmgr-commands.adoc`, `chapter-job-management.adoc`에서 연결된 문서를 읽는다.
 
-IEFBR14와 IEBGENER는 해당 Utility 모듈의 `pages/etc/sect-iefbr14.adoc`, `pages/ds/sect-iebgener.adoc`를 확인한다. 매뉴얼이 문법 검사만 지원한다고 명시한 오퍼랜드를 실제 기능이 구현된 것으로 취급하지 않는다.
+IEFBR14와 IEBGENER는 해당 Utility 모듈의 `pages/etc/sect-iefbr14.adoc`, `pages/ds/sect-iebgener.adoc`를 확인한다. MSP rb_73 실측에서는 IEFBR14 소스를 `KDJBR14`라는 이름으로 설치하므로 최소 실행 JOB의 `PGM`도 `KDJBR14`를 사용한다. 매뉴얼이 문법 검사만 지원한다고 명시한 오퍼랜드를 실제 기능이 구현된 것으로 취급하지 않는다.
 
 ## 기본 구조
 

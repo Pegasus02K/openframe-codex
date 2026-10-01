@@ -18,7 +18,7 @@ BATCH OS는 사용자가 지정해야 한다. 미지정이면 질문하며 예�
 
 ## 설치와 검증
 
-[설치 상세 절차](references/setup.md)를 순서대로 수행한다. 기존 HOME 환경 파일을 개별 서브셸에서 적용해 포트, Tmax SHMKEY, TCache SHMKEY와 경로를 비교한다. ss/ipcs의 현재 사용량도 확인한다. 꺼진 환경의 설정값도 충돌 대상이다.
+[설치 상세 절차](references/setup.md)를 순서대로 수행한다. 기존 HOME 환경 파일을 개별 서브셸에서 적용해 포트, Tmax SHMKEY, TCache SHMKEY와 경로를 비교한다. 서버 기동 전 `openframe_base.conf`의 `ds.DATASET_RESOURCE.DATASET_SHMKEY`도 시스템에서 참조 가능한 다른 키와 겹치지 않는 값으로 바꾼다. ss/ipcs의 현재 사용량도 확인한다. 꺼진 환경의 설정값도 충돌 대상이다.
 
 DB 접속값/ENPASSWD는 출력하지 않는다. 설치 config와 로그의 권한을 제한한다. 초기 import는 신규 설치의 명시적 작업이며, 기존 환경의 일시 설정 변경에는 `common-ofconfig-manage`의 원본 확보·복원 절차를 적용한다.
 
@@ -29,3 +29,4 @@ IEFBR14 작성은 MVS/MSP/VOS3에서 `jcl-write-run-general`, XSP에서 `jcl-wri
 사용자에게 접속 후 source할 환경 파일, 소스/설치/로그 경로, 포트, JOB ID와 실패·미검증 범위를 알려준다. 사용자 요청 시 파일과 테스트 결과를 모두 보존한다. [실측 검증 기록](references/validation.md)을 참고한다.
 
 XSP는 [XSP 실측 기록](references/xsp-validation.md)도 읽는다. 해당 버전의 JOB RC 10과 애플리케이션 RC 0을 구분하며, 확인된 VB 읽기 실패를 성공으로 일반화하지 않는다.
+MSP는 [MSP 실측 기록](references/msp-validation.md)도 읽는다. MSP의 최소 유틸리티 이름, JOB RC 10과 애플리케이션 RC 0을 구분하며, XSP와 동일하게 재현된 VB 읽기 실패를 설치 성공으로 일반화하지 않는다.

@@ -49,7 +49,7 @@ ndbinit create -t DEFVOL
 
 OS에 해당하는 명령만 실행한다. **실측 MVS에서는 hidbinit 전에 추가 준비가 필요하다.** 공통 baseinit/batchinit/tacfinit을 완료한 뒤 `pfmtcacheadmin -c`, base/batch/tacf/hidb 설정 import, `mkdir -p "$OPENFRAME_HOME/hidb/lib"`를 먼저 수행하고 hidbinit을 실행한다. hidbinit이 HIDB_OBJECT_DIR를 읽고 하위 dlilibs를 만들기 때문이다. TCache를 이미 생성했다면 기동 단계에서 다시 초기화하지 않는다. MVS에서는 ims/scripts/init.sql을 해당 DB 계정으로 실행하고 생성 PSM의 유효 상태를 조회한다. SQL 클라이언트 종료 코드만으로 성공을 판단하지 않는다. 실측 Tibero tbsql은 `-s /nolog`를 잘못된 CONNECT로 처리했으므로 `tbsql -s`에 CONNECT/SQL을 stdin으로 공급했다. CONNECT에 암호가 들어가므로 echo/spool을 사용하지 않는다.
 
-설정 import 전에 독립 SHMKEY의 신규 TCache를 `pfmtcacheadmin -c`로 한 번 생성한다. 앞 단계에서 생성했다면 반복하지 않는다. 활성 openframe_base.conf의 BATCH_OS_TYPE을 실제 OS로 맞춘 뒤 `ofconfig import -f <file> -n "$OPENFRAME_NODENAME"`으로 base/batch/tacf를 가져온다. MVS는 hidb, MSP/XSP는 ndb/aim, VOS3는 ndb를 추가한다. NDB의 OS 설정은 MSP/XSP에 맞춘다. 원래 예제 NODE1을 고정하지 않는다. Tmax 기동 후 `ofconfig list -n "$OPENFRAME_NODENAME" -k BATCH_OS_TYPE -l`로 확인한다.
+설정 import 전에 독립 SHMKEY의 신규 TCache를 `pfmtcacheadmin -c`로 한 번 생성한다. 앞 단계에서 생성했다면 반복하지 않는다. 활성 `openframe_base.conf`의 `BATCH_OS_TYPE`을 실제 OS로 맞춘다. 서버 기동 전 같은 파일의 `ds.DATASET_RESOURCE.DATASET_SHMKEY`를 시스템에서 참조 가능한 다른 OpenFrame/Tmax/TCache 키와 겹치지 않는 값으로 바꾼다. 실행 중인 공유 메모리는 `ipcs`로 확인하고, 현재 꺼져 있어도 기존 환경 파일과 설정에서 참조되는 키까지 비교해 충돌을 피한다. 변경한 파일을 `ofconfig import -f <file> -n "$OPENFRAME_NODENAME"`으로 가져온 뒤 base/batch/tacf를 확인한다. MVS는 hidb, MSP/XSP는 ndb/aim, VOS3는 ndb를 추가한다. NDB의 OS 설정은 MSP/XSP에 맞춘다. 원래 예제 NODE1을 고정하지 않는다. Tmax 기동 후 `ofconfig list -n "$OPENFRAME_NODENAME" -k BATCH_OS_TYPE -l`로 확인한다.
 
 XSP 실측에서는 TCache 생성 전 `aiminit`이 DB 객체 생성을 마친 뒤 설정 캐시 오류를 출력했다. RC 0만으로 오류가 없었다고 판단하지 않는다. 초기화 로그·DB 객체와 초기화 후 서버 상태를 구분해 확인하고, 이미 생성된 스키마에 `aiminit create`를 무조건 다시 실행하지 않는다. TCache 생성과 설정 import를 마친 뒤에도 오류가 남는지 확인한다.
 
@@ -89,15 +89,19 @@ tmboot -s obmtsmgr
 
 `-m IPF`를 생략하거나 입력을 절대 경로로 주면 파싱 성공·RC 0이어도 map 파일이 생성되지 않을 수 있다. 실제 파일과 서버 RDY를 검증한다.
 
-OPENFRAME_HOME/scripts의 .sample을 활성 파일로 복사해 환경에 맞춘다. TSAM 테스트에는 tsam/{copybook,lib,temp} 등 설정이 가리키는 실제 디렉터리와 tsam_compile.sh 실행 경로도 확인한다.
+OPENFRAME_HOME/scripts의 .sample을 활성 파일로 복사해 환경에 맞춘다. TSAM 테스트에는 tsam/{copybook,lib,temp} 등 설정이 가리키는 실제 디렉터리와 tsam_compile.sh 실행 경로도 확인한다. 특히 소스에서 검증한 `base/src/ds/tsam/tsam_tibero.cfg`의 GCC include 설정을 설치본 `$OPENFRAME_HOME/scripts/tsam_tibero.cfg`에도 반영한다. 설치본 cfg가 샘플의 오래된 include를 유지하면 `idcams define`이 `TBR-9130: Unable to open the 'stddef.h' file`과 `TBR-9108`로 실패한다.
 
 ## 실제 성공 테스트
 
 1. 충돌 없는 테스트 dataset을 dscreate로 만들고 dslist/listcat으로 확인한다. spfedit의 지원 모드로 내용을 확인하고 dsdelete로 삭제한 뒤 카탈로그 제거를 확인한다. 사용자 보존 요청이 있으면 영구 보존용 결과 dataset과 삭제 검증용 dataset을 구분한다.
-2. jcl-write-run 계열 및 batch-job-run에 따라 IEFBR14를 제출한다. JOB ID, 최종 상태, 해당 OS/버전의 정상 STEP RC, JESMSG 등 출력 DD를 확인한다. XSP 실측 IEFBR14는 소스가 성공 시 10을 반환하므로 0을 일괄 강제하지 않는다.
-3. base/src/ds/tsam/test/create.sh을 읽고 TEST.* 삭제/생성 범위를 확인한다. 신규 스키마와 테스트 경로에서 실행하고 해당 OS의 make target으로 컴파일한다. 실측 target은 mvs/msp/xsp/vos이다.
+2. jcl-write-run 계열 및 batch-job-run에 따라 최소 유틸리티 JOB을 제출한다. MVS/VOS3는 실제 설치명을 확인해 IEFBR14를 사용하고, MSP rb_73 실측은 `$OPENFRAME_HOME/util/KDJBR14`가 설치되므로 `PGM=KDJBR14`를 사용한다. MSP에서 `PGM=IEFBR14`는 빌드 트리에 파일이 있어도 설치 실행 파일을 찾지 못해 A0016으로 실패했다. JOB ID, 최종 상태, 해당 OS/버전의 정상 STEP RC, JESMSG 등 출력 DD를 확인한다. XSP와 MSP 실측 실행 래퍼는 정상 애플리케이션 RC 0을 JOB/STEP RC 10으로 표시하므로 0을 일괄 강제하지 않는다.
+3. base/src/ds/tsam/test/create.sh을 읽고 TEST.* 삭제/생성 범위를 확인한다. 신규 스키마와 테스트 경로에서 실행하고 해당 OS의 make target으로 컴파일한다. 실측 target은 mvs/msp/xsp/vos이다. 초기 DELETE의 대상 없음은 허용하되 최종 DEFINE/LIBGEN 성공을 각각 확인한다.
 4. 쓰기→읽기 순서와 AIX/PATH, VB 테스트의 입력 의존성을 JCL에서 확인한다. 각각 JOB/STEP/SPOOL와 실제 레코드·카탈로그를 확인한다. DONE만으로 성공 판정하지 않는다. XSP의 OSAMFRUN에서는 애플리케이션 RC 0이 JOB/STEP RC 10으로 표시될 수 있다. 실제 SPOOL의 `Execution AP(...) done - RC(0), STATUS(R)`와 정상 종료, 오류 부재를 함께 확인한다. 상태/RC를 기대값으로 하드코딩해 결과 파일에 쓰지 말고 실제 출력에서 추출한다. 실패 시 자동 연속 제출을 멈추고 미실행 항목을 따로 기록한다.
 5. 환경 파일, 소스, 설치본, 로그와 JCL/SPOOL을 보존하고 실패한 테스트를 구분해 보고한다.
+
+`dslist`는 일치 항목이 0개여도 RC 0을 반환할 수 있다. 삭제 검증은 종료 코드 반전으로 판정하지 말고 출력의 `Total 0 entries` 또는 카탈로그 조회 결과를 확인한다.
+
+장기간 남아 있던 신규 테스트 인스턴스에서 `tmadmin`은 RDY인데 `ofconfig`/`tjesmgr`가 TPETIME 또는 응답 대기로 멈출 수 있다. 먼저 프로세스의 TMAXDIR 경로와 시작 시각을 확인해 사용자가 재기동한 인스턴스와 현재 테스트 인스턴스를 구분한다. 설치 검증 범위의 독립 테스트 인스턴스만 대상으로 정상 종료가 멈추면 `tmdown -i -y` 후 `tmboot`, `tjesmgr boot`를 수행하고 조회를 재검증한다. 기존 또는 공유 인스턴스에는 이 복구 절차를 적용하지 않는다.
 
 PTY UI가 TERM=dumb에서 보이지 않으면 해당 세션에 TERM=xterm을 지정한다. spfedit은 `-b`로 실제 레코드를 확인하고 F3으로 종료한다.
 

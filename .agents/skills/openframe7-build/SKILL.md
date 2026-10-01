@@ -35,3 +35,4 @@ MVS HiDB rb_72가 osi_io.h를 참조하면 OSI rb_72 소스·헤더를 추가 �
 결과에 OS, 브랜치/커밋, 경로, 성공한 빌드, 실패와 재시도, 미검증 범위를 기록한다. 실측 결과는 [검증 기록](references/validation.md)에 따른다.
 
 XSP에는 [XSP 실측 기록](../openframe7-setup/references/xsp-validation.md)의 빌드 옵션과 검증 한계도 확인한다.
+MSP에는 [MSP 실측 기록](../openframe7-setup/references/msp-validation.md)의 빌드 옵션, 설치 유틸리티 이름과 검증 한계도 확인한다.
