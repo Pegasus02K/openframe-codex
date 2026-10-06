@@ -63,8 +63,18 @@ Shared Object 형식 COBOL 애플리케이션은 환경의 실행 규약과 `OSA
 직접 액세스 데이터셋을 입력 FD로 지정하는 기본 모양은 다음과 같다. 실제 장치명, 파일명, 볼륨과 `DISP`는 카탈로그 및 프로그램 요구사항에서 확인한다.
 
 ```text
-\INPUT FD INPUT=DA,FILE=USER.INPUT,DISP=SHR
+\INPUT FD INPUT=DA,FILE=USER.INPUT
 ```
+
+XSP의 `DISP`는 MVS의 상태·후처리 튜플과 다르다. `DISP=SHR`를 가져오지 않는다. 생략하면 `KEEP`가 기본값이며, 카탈로그 등록이 필요하면 `DISP=CAT`, 배타적 사용과 등록이 필요하면 `DISP=(LOCK,CAT)`처럼 해당 XSP 오퍼랜드를 사용한다. 출력의 신규 할당 공간은 `CYL`/`TRK` 등과 별도로 확인한다.
+
+SPOOL 출력은 장치명 뒤에 `SOUT` 오퍼랜드를 지정한다. `LIST=SOUT`로 작성하면 `SOUT`를 장치/장치 그룹으로 해석하므로 올바른 SPOOL 지정이 아니다.
+
+```text
+\ FD LIST=DA,SOUT=A
+```
+
+`A`는 예시 출력 클래스다. 실제 값은 환경의 `tjes/OUTCLASS` 또는 성공 JCL에서 확인한다. 출력이 불필요하면 프로그램 요구사항에 따라 `LIST=DUMMY`를 사용할 수 있지만, 결과 검증에 필요한 LIST를 없애지 않는다. FCPY 작성 시 [FD 작성·실패 점검 사례](xsp-fd-checks.md)를 함께 읽는다.
 
 인라인 입력의 기본 모양은 다음과 같다.
 
