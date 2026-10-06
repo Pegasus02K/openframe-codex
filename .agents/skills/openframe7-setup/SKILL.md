@@ -30,3 +30,5 @@ IEFBR14 작성은 MVS/MSP/VOS3에서 `jcl-write-run-general`, XSP에서 `jcl-wri
 
 XSP는 [XSP 실측 기록](references/xsp-validation.md)도 읽는다. 해당 버전의 JOB RC 10과 애플리케이션 RC 0을 구분하며, 확인된 VB 읽기 실패를 성공으로 일반화하지 않는다.
 MSP는 [MSP 실측 기록](references/msp-validation.md)도 읽는다. MSP의 최소 유틸리티 이름, JOB RC 10과 애플리케이션 RC 0을 구분하며, XSP와 동일하게 재현된 VB 읽기 실패를 설치 성공으로 일반화하지 않는다.
+
+7.4 Oracle 프로필은 [Oracle 설치 차이와 실측](references/validation-74-oracle.md)을 함께 읽는다. 초기 import 뒤 DB와 캐시의 실제 적용값, Oracle JOB LIB_PATH 및 설치 scripts의 Oracle cfg를 검증한다.

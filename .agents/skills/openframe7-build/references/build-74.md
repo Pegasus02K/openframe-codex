@@ -41,3 +41,7 @@ Oracle 참고 환경은 옵션과 구조의 참고 자료다. Tibero 선택 시 
 - DB 드라이버는 설치된 libtdbconnsw.so의 실제 링크 대상으로 확인한다. 라이브러리는 `.so.64.7_4_0_0_0` 같은 버전 접미사를 사용하므로 고정 `.so` 파일명만 검사하지 않는다.
 - dev/make/rules.tool은 파일 target에도 설치 복사를 포함하며 기본 INSTALL_DIR은 HOME/bin이다. 기존 공용 도구를 보존하려면 `make -C dev/tool/oflicgen INSTALL_DIR="$OPENFRAME_HOME/bin"`으로 설치 경로를 지정한다. 실제 세 환경에서 이 변수 지정 후 재빌드하여 복사 경로와 기존 MVS 바이너리 보존을 확인했다. 파일 target 선택이나 BIN_DIR 지정만으로 설치 복사가 생략된다고 가정하지 않는다.
 - OS별 최종 빌드·전처리·링크 검사와 실행 검증 결과와 미검증 범위는 [7.4 MSP/XSP/VOS3 실측](../../openframe7-setup/references/validation-74-non-mvs.md)을 참고한다.
+
+## Oracle 프로필
+
+`rdb: oracle`이면 [Oracle 빌드 보완](build-74-oracle.md)을 함께 읽는다. 실제 client 헤더·Pro*C cfg·활성 config.local과 Oracle JOB의 라이브러리 경로를 확인한다. 실행 검증 결과는 [MVS Oracle 실측](../../openframe7-setup/references/validation-74-oracle.md)에 기록한다.

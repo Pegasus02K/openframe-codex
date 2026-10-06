@@ -10,7 +10,7 @@ description: OpenFrame 7 소스를 지정된 BATCH OS와 환경 프로필에서 
 ## 환경과 사전 조건
 
 - `.agents/openframe.local.yaml`을 데이터로 읽고 사용자가 지정한 프로필 또는 default_environment를 선택한다. type별 접속·인증을 따른다. 매 새 셸에서 env_path를 적용하고 SOURCE_BASE/OPENFRAME_HOME을 검증한 후 SOURCE_BASE로 이동한다.
-- 새 설치 경로와 env_path가 프로필에 이미 지정되어 있으면 그 경로를 검증해 사용한다. 별도 테스트 환경이 필요한 경우 기존 env_path를 예제로 읽어 HOME에 새 환경 파일을 만든다. 새 경로가 정해지지 않았으면 확인하고 기존 소스·설치를 덮어쓰지 않는다. 초기 디렉터리를 만든 뒤 해당 파일을 적용하고 이후 모든 작업에 사용한다. 설정 YAML은 요청한 범위에서만 바꾼다.
+- 새 설치 경로와 env_path가 프로필에 이미 지정되어 있으면 그 경로를 검증해 사용한다. 별도 테스트 환경이 필요한 경우 기존 env_path를 예제로 읽어 HOME에 새 환경 파일을 만든다. 사용자가 이름 선택을 맡기면 리모트의 기존 파일·경로를 확인해 충돌 없는 이름을 정하고, 선택을 맡기지 않았으면 확인한다. 기존 소스·설치를 덮어쓰지 않는다. 초기 디렉터리를 만든 뒤 해당 파일을 적용하고 이후 모든 작업에 사용한다. 설정 YAML은 요청한 범위에서만 바꾼다.
 - `openframe7-setup`의 [환경 템플릿](../openframe7-setup/assets/env_openframe7.sh.template)을 실제 예제와 비교해 사용한다. 개인 호스트·비밀번호를 공용 assets에 넣지 않는다.
 - 필요한 Tmax, TCache, Tibero client 배포본은 **$HOME/packages**에서 찾는다. 없으면 경로를 질문한다. ProSort/OFCOBOL과 라이선스는 사용 가능한 예제 환경에서 확인한다. VOS3에는 ofcbpph도 확인한다.
 - 패키지가 없다고 자동 설치하지 않는다. 실패 증거, 필요한 패키지명과 설치 명령을 제시해 사용자 허가를 받은 뒤 설치하고 발견한 의존성을 설치 스킬에 기록한다.
@@ -36,3 +36,5 @@ Tmax/TCache 설치와 충돌 없는 환경 준비는 `openframe7-setup`의 선�
 
 XSP에는 [XSP 실측 기록](../openframe7-setup/references/xsp-validation.md)의 빌드 옵션과 검증 한계도 확인한다.
 MSP에는 [MSP 실측 기록](../openframe7-setup/references/msp-validation.md)의 빌드 옵션, 설치 유틸리티 이름과 검증 한계도 확인한다.
+
+7.4 Oracle 프로필은 [Oracle 빌드 보완](references/build-74-oracle.md)을 함께 읽는다.
