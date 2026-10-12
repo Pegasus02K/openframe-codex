@@ -1,0 +1,4 @@
+interface:
+  display_name: "Common OFCOBOL Compile"
+  short_description: "Build and install OpenFrame COBOL test programs"
+  default_prompt: "Use $common-ofcobol-compile to compile and install this COBOL test program with the selected OpenFrame OS profile."

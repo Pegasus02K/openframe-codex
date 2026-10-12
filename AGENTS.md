@@ -96,7 +96,8 @@
 | --- | --- |
 | TmaxSoft Jira 이슈 접근·내용·필드 확인 | `.agents/skills/common-tmaxsoft-jira-read` |
 | OpenFrame 설정 조회·가역 변경·복원 | `.agents/skills/common-ofconfig-manage` |
-| Fujitsu COBOL 테스트 모듈 전처리·컴파일·배치 | `.agents/skills/common-netcobol-compile` |
+| `COBOL_COMPILER=NETCOBOL`인 COBOL 테스트 모듈 전처리·컴파일·배치 | `.agents/skills/common-netcobol-compile` |
+| `COBOL_COMPILER=OFCOBOL`인 COBOL 테스트 모듈 컴파일·배치 | `.agents/skills/common-ofcobol-compile` |
 | OpenFrame C/C++ 단위 테스트 작성·보강 및 gcov 커버리지 검증 | `.agents/skills/common-unit-test-write` |
 | OpenFrame 7 소스 빌드·설치 | `.agents/skills/openframe7-build` |
 | 신규 환경·DB 초기화·서비스 및 설치 검증 | `.agents/skills/openframe7-setup` |
@@ -106,6 +107,19 @@
 | MVS·MSP·VOS3 JCL 작성·문법 수정 | `batch/.agents/skills/jcl-write-run-general` |
 
 JCL을 실제 제출·실행하면 작성 스킬과 `batch-job-run`을 함께 사용한다. MVS·MSP·VOS3 기본 문법은 공통 스킬에서 관리하고, 특수 기능은 해당 OS 매뉴얼과 설치 버전의 지원 여부를 확인한다.
+
+### COBOL 컴파일러 라우팅
+
+- COBOL 컴파일 작업은 선택한 환경의 `env_path`를 적용한 뒤 `common-ofconfig-manage`로 현재 노드의 `ofsys.COMPILER.COBOL_COMPILER`를 조회하고, 그 결과로 컴파일 스킬과 도구를 선택한다.
+
+```sh
+test -n "${OPENFRAME_NODENAME:-}" || exit 1
+ofconfig list -n "$OPENFRAME_NODENAME" -s ofsys -sec COMPILER -k COBOL_COMPILER -l
+```
+
+- `DEFAULT_VALUE`가 아닌 현재 `VALUE`를 사용한다. `OFCOBOL`이면 `common-ofcobol-compile`, `NETCOBOL`이면 `common-netcobol-compile`을 적용한다. `MFCOBOL`이면 해당 환경의 Micro Focus 컴파일 절차를 확인해 적용한다.
+- 컴파일러를 선택한 뒤 프로필의 OS와 대상 제품에 맞는 전처리·copybook·링크 옵션을 결정한다. 기존 스크립트의 호출 명령이 조회한 `VALUE`와 다르면 그대로 실행하지 않고 설정에 맞는 컴파일 명령을 구성한다.
+- 조회 실패·빈 값·알 수 없는 값은 기본값이나 설치된 바이너리로 대신 판단하지 않는다. 원인을 보고하고 컴파일을 중단한다. 컴파일러 선택을 위해 설정을 임의 변경하지 않는다.
 
 ### Jira 이슈 수정에서 테스트까지
 

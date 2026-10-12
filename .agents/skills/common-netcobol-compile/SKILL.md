@@ -10,8 +10,17 @@ description: 후지쯔 사양 COBOL 테스트 프로그램을 ofcbppf로 전처�
 ## 사전 확인
 
 1. 루트 `AGENTS.md`의 프로필 선택·접속·인증·환경 적용 절차를 따른다. 제품 작업은 환경 파일에서 읽은 `$SOURCE_BASE`에서 수행한다.
-2. 소스 파일, copybook, `PROGRAM-ID`, COBOL `SELECT`의 DD 이름, JCL의 프로그램명·DD·`PRGLIB`를 대조한다.
-3. 도구와 환경을 확인한다.
+2. `common-ofconfig-manage`로 현재 노드의 `ofsys.COMPILER.COBOL_COMPILER`를 조회하고 `DEFAULT_VALUE`가 아닌 현재 `VALUE`로 컴파일러를 선택한다.
+
+```bash
+test -n "${OPENFRAME_NODENAME:-}" || exit 1
+ofconfig list -n "$OPENFRAME_NODENAME" -s ofsys -sec COMPILER -k COBOL_COMPILER -l
+```
+
+`NETCOBOL`이면 이 스킬을 계속 적용하고, `OFCOBOL`이면 `common-ofcobol-compile`로 라우팅한다. `MFCOBOL`이면 대상 환경의 Micro Focus 절차를 확인한다. 조회 실패·빈 값·알 수 없는 값은 원인을 보고하고 컴파일하지 않는다. 컴파일러 선택을 위해 설정을 변경하지 않으며 스크립트의 호출 명령이 조회한 `VALUE`와 다르면 그대로 실행하지 않는다.
+
+3. 소스 파일, copybook, `PROGRAM-ID`, COBOL `SELECT`의 DD 이름, JCL의 프로그램명·DD·`PRGLIB`를 대조한다.
+4. 도구와 환경을 확인한다.
 
 ```bash
 test -n "$OPENFRAME_HOME"
@@ -20,7 +29,7 @@ command -v cobol
 printf '%s\n' "$COBDIR" "$COBCOPY"
 ```
 
-4. 대상 디렉터리에 Makefile이 있으면 전처리 옵션, 링크 라이브러리, `-WC` 옵션, 산출물 이름을 우선 적용한다. 아래 기본 옵션으로 덮어쓰지 않는다.
+5. 대상 디렉터리에 Makefile이 있으면 전처리 옵션, 링크 라이브러리, `-WC` 옵션, 산출물 이름을 우선 적용한다. 아래 기본 옵션으로 덮어쓰지 않는다.
 
 ## 파일 OPEN 재현 프로그램 설계
 
