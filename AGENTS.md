@@ -91,6 +91,7 @@
 | TmaxSoft Jira 이슈 접근·내용·필드 확인 | `.agents/skills/common-tmaxsoft-jira-read` |
 | OpenFrame 설정 조회·가역 변경·복원 | `.agents/skills/common-ofconfig-manage` |
 | Fujitsu COBOL 테스트 모듈 전처리·컴파일·배치 | `.agents/skills/common-netcobol-compile` |
+| OpenFrame C/C++ 단위 테스트 작성·보강 및 gcov 커버리지 검증 | `.agents/skills/common-unit-test-write` |
 | OpenFrame 7 소스 빌드·설치 | `.agents/skills/openframe7-build` |
 | 신규 환경·DB 초기화·서비스 및 설치 검증 | `.agents/skills/openframe7-setup` |
 | TSAM 데이터셋·copybook 준비·정리 | `base/.agents/skills/base-tsam-create` |
@@ -99,6 +100,16 @@
 | MVS·MSP·VOS3 JCL 작성·문법 수정 | `batch/.agents/skills/jcl-write-run-general` |
 
 JCL을 실제 제출·실행하면 작성 스킬과 `batch-job-run`을 함께 사용한다. MVS·MSP·VOS3 기본 문법은 공통 스킬에서 관리하고, 특수 기능은 해당 OS 매뉴얼과 설치 버전의 지원 여부를 확인한다.
+
+### Jira 이슈 수정에서 테스트까지
+
+- 이슈 내용 확인은 `common-tmaxsoft-jira-read`, 서버 측 원인 조사는 사용 가능한 `openframe-issue-investigate`를 적용한다. 분석·제안만 요청받았으면 소스 수정이나 테스트 실행으로 넘어가지 않는다.
+- Jira 이슈의 C/C++ 코드 수정을 요청받았으면 원인·기대 동작·영향 범위를 정리하고 위임받은 범위에서 구현과 관련 단위 테스트 작성·실행·gcov 검증까지 이어간다. 사용자가 테스트 제외 또는 별도 범위를 지정하면 이를 우선한다. 수정 제안만 요청받았을 때는 구현 권한을 추정하지 않는다.
+- 구현 전 `common-unit-test-write` 전체를 읽고 이슈 ID·재현 조건·기대 결과·대상 파일/함수·변경 예정 줄/분기를 테스트 계획으로 전달한다. 해당 스킬은 작성뿐 아니라 빌드·실행·커버리지 검증과 테스트 함수별 보고까지 담당한다.
+- 소스 수정 전 Git 상태·pull·이슈 브랜치 절차를 적용한다. 테스트 등록과 실행은 선택한 프로필 및 실제 Makefile을 따른다. 관련 테스트가 없다는 이유로 단위 테스트 작성을 자동 생략하지 않는다.
+- 단위 테스트가 불가능하거나 지나치게 길어지는 경우(예: 200줄 이상), 새로운 모킹이 필요한 경우에는 `common-unit-test-write`의 사용자 추가 지침 절차를 따른다. 재현 테스트로 임의 대체하거나 새 mock을 먼저 구현하지 않는다.
+- 단위 테스트는 제품별 런타임 검증을 대체하지 않는다. 추가 JOB 검증은 OS별 JCL 작성 스킬과 `batch-job-run`, 설정 조회·가역 변경은 `common-ofconfig-manage`를 함께 적용하며 요청 범위의 상태 변경 제한을 유지한다.
+- 완료 보고는 이슈의 요구 동작 → 수정 함수/파일 → 테스트 함수/조건 → 실행 결과 → gcov 변경 코드 결과를 연결하고, 실패·미검증·사용자 지침 대기를 구분한다.
 
 ## 작업 환경
 제품 소스 수정·빌드·런타임 검증은 선택한 프로필의 환경에서 수행한다. 이 지침 저장소의 AGENTS.md·스킬·샘플·템플릿 자체를 관리하는 요청은 지정된 체크아웃에서 편집하고 정적 검증하며, 제품 환경 진입은 필요하지 않다. 개인 로컬 YAML은 요청 없이 변경하지 않는다.
