@@ -5,13 +5,13 @@ description: OpenFrame의 BATCH_OS_TYPE을 확인해 XSP 환경에서만 Fujitsu
 
 # XSP JCL 작성 및 실행
 
-현재 환경이 XSP인지 확인하고 Fujitsu 형식 JCL을 작성한 뒤 실제 배치 실행 결과까지 검증한다. MVS, MSP, VOS3 문법을 XSP 문법으로 가장하지 않는다.
+현재 환경이 XSP인지 확인하고 Fujitsu 형식 JCL을 작성한다. 실행이 요청된 경우 JOB·STEP·SPOOL과 업무 결과를 검증한다.
 
 ## 필수 경계
 
-1. 루트 `AGENTS.md`와 `.agents/openframe.local.yaml`에서 환경 프로필을 선택하고 해당 `env_path`를 적용한다. `type: remote`이면 SSH 서버에서 직접 작업하며 컨테이너에 진입하지 않고, `type: remote_container`일 때만 지정된 컨테이너에서 작업한다. 원격 인증은 `ssh_private_key`를 우선하며, 이 값이 없을 때만 `ssh_password`로 접속한다. 둘 다 있으면 비밀번호는 필요한 `sudo` 인증에만 사용하고 노출하거나 명령에 삽입하지 않는다.
+1. 루트 `AGENTS.md`의 프로필 선택·접속·인증·환경 적용 절차를 따른다. 제품 작업은 환경 파일에서 읽은 `$SOURCE_BASE`에서 수행한다.
 2. `$OPENFRAME_NODENAME`, `$SOURCE_BASE`, `$OPENFRAME_HOME`, `ofconfig`, `tjesmgr`를 확인한다.
-3. 다음 상세 조회의 `VALUE`가 정확히 `XSP`일 때만 계속한다.
+3. `common-ofconfig-manage`의 조회 절차로 다음 상세 조회의 `VALUE`가 정확히 `XSP`일 때만 계속한다.
 
 ```bash
 node_name="${OPENFRAME_NODENAME:?OPENFRAME_NODENAME is not set}"
@@ -21,7 +21,7 @@ ofconfig list -n "$node_name" -k BATCH_OS_TYPE -l
 - 노드 이름을 `NODE1`로 고정하지 않는다.
 - 값이 `MVS`, `MSP`, `VOS3`이면 `$jcl-write-run-general`로 라우팅한다. XSP를 명시한 요청과 현재 환경이 다르면 대상 환경을 확인한다. 조회가 실패하면 작성·제출을 중단하고 원인을 확인한다.
 - 설정을 바꾸어 XSP 테스트를 만들지 않는다.
-- 실제 제출과 결과 확인에는 반드시 `$batch-job-run`을 함께 사용한다.
+- 작성·수정만 요청되면 제출하지 않는다. 실제 제출과 결과 확인에는 `$batch-job-run`을 함께 사용한다.
 
 ## 작업 절차
 
@@ -57,15 +57,7 @@ JCL을 작성하거나 MVS 형식을 변환하기 전에 [XSP JCL 문법](refere
 
 ### 4. 실제 실행하고 검증하기
 
-`$batch-job-run`의 절차에 따라 실제 `SYS1.JCLLIB`을 확인하고 JCL을 배치한 뒤 `tjesmgr`로 제출한다. 제출 후 다음을 모두 확인한다.
-
-1. 제출 메시지의 실제 JOB ID
-2. `PS` 또는 `PSJOB`의 최종 JOB 상태
-3. 모든 STEP의 상태와 RC
-4. `PSJOB`/`POSPOOL` 이후 `PODD`로 확인한 관련 SPOOL
-5. 요청이 요구한 데이터셋, 카탈로그, 레코드 또는 애플리케이션 결과
-
-`DONE`만으로 성공을 판단하지 않는다. 테스트용 JCL 멤버와 임시 파일은 정확한 경로를 확인한 뒤 정리하되, 기존 파일과 JOB SPOOL을 임의로 삭제하지 않는다.
+`$batch-job-run`의 배치·제출·JOB 상태·STEP RC·동일 PTY SPOOL 확인 절차를 따른다. 요청된 데이터셋·카탈로그·레코드·애플리케이션 결과도 별도로 확인한다. 테스트 멤버와 임시 파일은 이번 작업에서 만든 정확한 경로만 정리하고 기존 파일과 JOB SPOOL은 보존한다.
 
 ## 실패 분류
 

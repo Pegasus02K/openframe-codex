@@ -1,3 +1,4 @@
+# Tibero environment example; Oracle profiles must use their actual client setup.
 # Render every @...@ marker before sourcing; no DB password belongs here.
 export OPENFRAME_NODENAME='@NODE_NAME@'
 export OPENFRAME_INSTANCE_NAME='@INSTANCE_NAME@'

@@ -108,4 +108,4 @@ control statement
 \ JEND
 ```
 
-이 결과에서도 제출 성공, JOB 최종 상태, `SMOKE` STEP RC와 관련 SPOOL을 모두 확인한다. 예를 들어 2026-08-12의 OpenFrame 7.3 XSP 테스트 환경에서는 설치된 `/opt/oframe/util/IEFBR14`가 직접 실행과 TJES에서 모두 RC 10을 반환했고, `Done(R00010)`, `STATUS=R`, `ABEND=0`으로 정상 종료했다. 다른 환경에는 이 관찰값을 그대로 적용하지 말고 그 환경의 유틸리티, JOB 상태와 SPOOL을 다시 확인한다.
+최소 JOB에서도 제출 성공, 실제 JOB ID, JOB 최종 상태, STEP RC와 관련 SPOOL을 확인한다. 정상 RC는 현재 설치 프로그램의 계약과 실행 결과에서 확인하고 해당 세션에서 보고한다.

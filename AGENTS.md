@@ -56,12 +56,11 @@
 
 - `env_path`는 모든 환경 프로필에 필수다. 소스 루트와 OpenFrame 설치 루트는 로컬 설정에 중복 기록하지 않고, 이 환경 파일을 적용한 뒤 각각 `$SOURCE_BASE`와 `$OPENFRAME_HOME`에서 읽는다.
 - `local` 프로필에서 DB 접속이 필요한 작업을 수행할 수 있다면 `rdb_connect_string`을 정의한다. 필요한 값이 없으면 추측하지 말고 사용자에게 요청한다.
-- 제품 버전은 프로필의 `version`으로 선택한다. 최상위 `version`은 설정 스키마 버전이다. 7.3은 Tibero, 7.4는 Tibero/Oracle을 지원한다. 프로필 `os`를 기본 BATCH OS로 사용하며 명시적인 사용자 지시가 우선한다. `tibero_connect_string`은 `rdb_connect_string`으로 대체한다.
-- 7.4 소스는 `http://192.168.51.106/openframe/openframe7/ofsrc.git` 통합 저장소다. 클론 경로 자체가 `$SOURCE_BASE`이며 `ofrelease.sh`는 저장소 최상단에서 실행한다. 7.3의 제품별 저장소·release 절차와 혼용하지 않는다.
+- 프로필 `version`·`os`·`rdb`로 제품 환경을 선택하며 명시적인 사용자 지시가 우선한다. 7.3은 Tibero, 7.4는 Tibero/Oracle을 지원한다. DB 접속 키는 `rdb_connect_string`을 사용한다.
+- 버전별 저장소·release·빌드 절차는 `openframe7-build`의 참조 문서를 따른다. 7.4는 통합 저장소 클론 자체가 `$SOURCE_BASE`이며 루트 `ofrelease.sh`를 사용한다. 7.3 제품별 절차와 혼용하지 않는다.
 - 설정 파일이나 선택한 프로필에 필요한 키가 없으면 값을 추측하지 말고 사용자에게 요청한다. SSH 인증 정보가 없으면 개인키 내용 대신 `ssh_private_key` 경로 또는 `ssh_password` 중 하나를 요청한다.
 - 각 값은 처음 사용하기 전에 해당 실행 위치에서 검증한다. 특히 매뉴얼 경로와 `env_path` 파일이 실제로 존재하는지 확인한다. `remote`와 `remote_container` 프로필에서 `ssh_private_key`를 선택했다면 개인키 파일과 키 인증을 확인하고, `ssh_password`만 선택했다면 비밀번호 인증을 확인한다. `remote_container`에서는 컨테이너도 확인한다.
-- 선택한 작업 환경에 진입하면 다른 작업보다 먼저 `env_path`를 현재 셸에 맞는 방식으로 적용한다. 환경 파일은 신뢰된 로컬 셸 코드로 취급하며 내용을 불필요하게 출력하지 않는다. 적용 후 `$SOURCE_BASE`와 `$OPENFRAME_HOME`이 모두 비어 있지 않고 각각 실제 디렉터리를 가리키는지 확인한다.
-- 환경 파일 적용 결과는 셸 프로세스마다 유지된다. 새 셸을 열거나 별도의 SSH 원격 명령 또는 `docker exec`를 실행할 때마다 같은 명령 안에서 `env_path`를 다시 적용한 뒤 작업한다.
+- 제품 환경에 진입하면 아래 작업 환경 절차로 `env_path`를 먼저 적용하고 루트 경로를 검증한다. 환경 파일은 신뢰된 셸 코드로 취급하며 내용을 불필요하게 출력하지 않는다.
 - OpenFrame 노드 이름은 로컬 설정에 두지 않고 선택한 환경에 설정된 `$OPENFRAME_NODENAME`을 사용한다. 관련 명령을 실행하기 전에 이 값이 비어 있지 않은지 확인한다.
 - 접속 문자열 등 민감할 수 있는 값은 불필요하게 화면이나 작업 보고에 출력하지 않는다.
 
@@ -81,125 +80,58 @@
 - Jira 이슈를 근거로 작업하더라도 이 라우팅을 생략하지 않는다. 이슈는 요구사항과 재현 정보의 출처이고, 실제 코드 구조·빌드·테스트 방법은 해당 `AGENTS.md`와 현재 환경에서 확인한다.
 
 ## 스킬 연동
+- 지침과 스킬에는 재사용 가능한 절차·판단 기준·안전 경계만 포함한다. 특정 세션의 날짜, 환경·배포본 버전 조합, 브랜치/커밋, 포트·키·JOB ID, 성공·실패 결과와 우회 이력은 포함하지 않는다. 제품 사양에 따른 버전·OS·DB별 절차와 자리표시자 예제는 유지할 수 있다.
+- 실제 환경값·검증 결과·장애 조치와 미확인 사항은 각 세션에서 현재 증거로 확인해 사용자에게 보고하고, 필요한 결정은 해당 세션에서 사용자와 확인한다.
 - 사용자 요청이 설치된 스킬의 설명과 일치하거나 사용자가 스킬을 지정하면, 작업 전에 해당 `SKILL.md` 전체와 현재 작업에 필요한 참조 문서를 읽고 그 절차를 따른다.
 - 스킬은 도메인별 실행 절차를 보완한다. 소스 수정 위치, 제품별 빌드, 테스트 및 보고는 루트와 대상 하위 `AGENTS.md`를 계속 적용한다.
 - 스킬 안의 쓰기 금지, 최소 권한, 인증 정보 보호 등 안전 경계는 다른 작업 지침으로 완화하지 않는다.
 
-### TmaxSoft Jira 읽기 스킬
-사용자가 `https://tmaxsoft.atlassian.net/browse/<ISSUE-KEY>` 형식의 이슈 URL에 대한 접근 확인, 내용 확인, 보이는 필드 추출을 요청하거나 TmaxSoft Jira 이슈를 작업 요구사항 또는 장애 재현의 근거로 읽어 달라고 하면 `common-tmaxsoft-jira-read` 스킬을 사용한다.
+| 요청 | 스킬 위치 |
+| --- | --- |
+| TmaxSoft Jira 이슈 접근·내용·필드 확인 | `.agents/skills/common-tmaxsoft-jira-read` |
+| OpenFrame 설정 조회·가역 변경·복원 | `.agents/skills/common-ofconfig-manage` |
+| Fujitsu COBOL 테스트 모듈 전처리·컴파일·배치 | `.agents/skills/common-netcobol-compile` |
+| OpenFrame 7 소스 빌드·설치 | `.agents/skills/openframe7-build` |
+| 신규 환경·DB 초기화·서비스 및 설치 검증 | `.agents/skills/openframe7-setup` |
+| TSAM 데이터셋·copybook 준비·정리 | `base/.agents/skills/base-tsam-create` |
+| JCL 제출·JOB 상태·STEP RC·SPOOL 검증·실행 실패 조사 | `batch/.agents/skills/batch-job-run` |
+| XSP JCL 작성·변환·문법 수정 | `batch/.agents/skills/jcl-write-run-xsp` |
+| MVS·MSP·VOS3 JCL 작성·문법 수정 | `batch/.agents/skills/jcl-write-run-general` |
 
-### OpenFrame 배치 잡 실행 스킬
-사용자가 OpenFrame Batch 테스트 JCL 제출·실행, JOB 상태·STEP RC·SPOOL 결과 검증 또는 배치 실패 원인 조사를 요청하면 `batch-job-run` 스킬을 사용한다.
-
-### XSP JCL 작성 및 실행 스킬
-사용자가 XSP JCL 작성, MVS 형식 JCL의 XSP 변환, XSP JCL 문법 오류 수정 또는 작성한 XSP JCL의 실제 실행 검증을 요청하면 `jcl-write-run-xsp` 스킬을 사용한다. 실제 제출·실행이 포함되면 `batch-job-run` 스킬도 함께 사용한다.
-
-### MVS·MSP·VOS3 JCL 작성 및 실행 스킬
-사용자가 MVS, MSP 또는 VOS3 JCL 작성, 문법 오류 수정 또는 작성한 JCL의 실제 실행 검증을 요청하면 `jcl-write-run-general` 스킬을 사용한다. 세 OS의 기본 문법은 하나의 스킬에서 관리하고, OS별 특수 기능이 필요한 경우 해당 OS 매뉴얼과 지원 여부를 먼저 확인한다. 실제 제출·실행이 포함되면 `batch-job-run` 스킬도 함께 사용한다.
-
-### OpenFrame 설정 관리 스킬
-사용자가 OpenFrame 설정 조회, 상세 정보·허용 범위 확인, 테스트를 위한 가역적 임시 변경 또는 원래 값 복원을 요청하면 `common-ofconfig-manage` 스킬을 사용한다.
+JCL을 실제 제출·실행하면 작성 스킬과 `batch-job-run`을 함께 사용한다. MVS·MSP·VOS3 기본 문법은 공통 스킬에서 관리하고, 특수 기능은 해당 OS 매뉴얼과 설치 버전의 지원 여부를 확인한다.
 
 ## 작업 환경
-선택한 프로필의 `type`에 따라 작업 환경에 진입한다.
+제품 소스 수정·빌드·런타임 검증은 선택한 프로필의 환경에서 수행한다. 이 지침 저장소의 AGENTS.md·스킬·샘플·템플릿 자체를 관리하는 요청은 지정된 체크아웃에서 편집하고 정적 검증하며, 제품 환경 진입은 필요하지 않다. 개인 로컬 YAML은 요청 없이 변경하지 않는다.
 
-### 로컬 환경
+| type | 작업 위치와 진입 |
+| --- | --- |
+| `local` | 로컬 호스트의 현재 셸 |
+| `remote` | SSH 대상 서버. 컨테이너 진입이나 `docker exec`를 사용하지 않는다. |
+| `remote_container` | SSH 접속 후 `docker exec -it "{{of_container_name}}" bash`로 진입한 지정 컨테이너 |
 
-`type: local`이면 에이전트가 실행되는 로컬 호스트에서 환경 파일을 먼저 적용한 후 소스 루트로 이동한다. 현재 셸에 맞는 명령을 사용한다. POSIX 셸에서는 다음과 같이 실행한다.
+SSH는 `ssh_private_key`가 있으면 `ssh -i "{{ssh_private_key}}" "{{ssh_address}}"`, 없으면 `ssh "{{ssh_address}}"`로 접속하고 비밀번호를 인증 프롬프트에 입력한다. 인증 선택과 비밀 보호는 위 로컬 환경 설정 규칙을 따른다.
+
+작업 위치에 진입한 뒤 POSIX 셸에서는 다음을 실행한다.
 
 ```sh
-test -f "{{env_path}}"
-. "{{env_path}}"
-test -d "${SOURCE_BASE:?SOURCE_BASE is not set}"
-test -d "${OPENFRAME_HOME:?OPENFRAME_HOME is not set}"
-cd "$SOURCE_BASE"
+test -f "{{env_path}}" || exit 1
+. "{{env_path}}" || exit 1
+test -d "${SOURCE_BASE:?SOURCE_BASE is not set}" || exit 1
+test -d "${OPENFRAME_HOME:?OPENFRAME_HOME is not set}" || exit 1
+cd "$SOURCE_BASE" || exit 1
 ```
 
-PowerShell 환경 파일이면 `Test-Path`로 확인하고 dot-source한 뒤 `$env:SOURCE_BASE`와 `$env:OPENFRAME_HOME`이 비어 있지 않고 실제 디렉터리를 가리키는지 확인한다.
-
-파일 수정, 빌드, 테스트, 로그 확인은 모두 이 로컬 환경에서 수행한다.
-
-### SSH 원격 환경
-
-`type: remote`이면 다음 순서로 진입한다.
-
-1. VM에 SSH로 접속한다. `ssh_private_key`가 있으면 다음처럼 키 인증을 사용한다.
-   ```text
-   ssh -i "{{ssh_private_key}}" "{{ssh_address}}"
-   ```
-
-   `ssh_password`만 있으면 다음 명령을 실행하고 비밀번호 프롬프트에 값을 입력한다.
-   ```text
-   ssh "{{ssh_address}}"
-   ```
-
-2. SSH 대상 서버에서 환경 파일을 적용하고 OpenFrame 설치 루트를 검증한다.
-   ```sh
-   test -f "{{env_path}}"
-   . "{{env_path}}"
-   test -d "${SOURCE_BASE:?SOURCE_BASE is not set}"
-   test -d "${OPENFRAME_HOME:?OPENFRAME_HOME is not set}"
-   ```
-
-3. 같은 셸에서 소스 루트로 이동한다.
-   ```sh
-   cd "$SOURCE_BASE"
-   ```
-
-컨테이너에 진입하거나 `docker exec`를 사용하지 않는다. 비대화형 SSH 명령을 별도로 실행할 때는 각 호출에서 `env_path` 적용, 검증, 작업 명령을 하나의 원격 셸 실행으로 묶는다.
-
-### SSH 컨테이너 환경
-
-`type: remote_container`이면 다음 순서로 진입한다.
-
-1. VM에 SSH로 접속한다. `ssh_private_key`가 있으면 다음처럼 키 인증을 사용한다.
-   ```text
-   ssh -i "{{ssh_private_key}}" "{{ssh_address}}"
-   ```
-
-   `ssh_password`만 있으면 다음 명령을 실행하고 비밀번호 프롬프트에 값을 입력한다.
-   ```text
-   ssh "{{ssh_address}}"
-   ```
-
-2. SSH 접속 후 Docker 컨테이너에 들어간다.
-   ```text
-   docker exec -it "{{of_container_name}}" bash
-   ```
-
-3. 컨테이너 내부에서 환경 파일을 적용하고 OpenFrame 설치 루트를 검증한다.
-   ```sh
-   test -f "{{env_path}}"
-   . "{{env_path}}"
-   test -d "${SOURCE_BASE:?SOURCE_BASE is not set}"
-   test -d "${OPENFRAME_HOME:?OPENFRAME_HOME is not set}"
-   ```
-
-4. 같은 셸에서 소스 루트로 이동한다.
-   ```sh
-   cd "$SOURCE_BASE"
-   ```
-
-비대화형 `docker exec`를 별도로 실행할 때는 각 호출에서 `env_path` 적용, 검증, 작업 명령을 하나의 셸 실행으로 묶는다.
-
-## 주요 수정 범위
-프로젝트 전체를 대상으로 작업하되, 주 수정 범위는 다음 하위 디렉터리다. 각각의 제품명은 OpenFrame Base, Batch, HiDB, NDB다.
-
-- `base`
-- `batch/util`
-- `ims`
-- `ndb`
+PowerShell 환경 파일은 `Test-Path`로 확인하고 dot-source한 뒤 `$env:SOURCE_BASE`와 `$env:OPENFRAME_HOME`이 비어 있지 않고 실제 디렉터리인지 확인한다. 새 셸·비대화형 SSH·`docker exec` 호출마다 환경 적용·검증과 작업 명령을 같은 셸 실행으로 묶는다.
 
 ## 빌드 및 테스트 환경의 기본 사항
-이 프로젝트는 OpenFrame 7로, Tmax와 RDBMS(해당 환경은 Tibero)와 연동되어 동작한다.
+OpenFrame 7은 Tmax와 프로필의 RDBMS(Tibero 또는 Oracle)에 연동된다.
 
 - 제품 전체에 대한 매뉴얼은 `{{manual_base}}`의 하위 디렉터리들의 `docs`를 참고한다. 이 중 공통 설정에 대한 매뉴얼은 `{{manual_base}}/openframe_common`을 참고한다.
-- 아래 런타임 명령은 선택한 환경에 OpenFrame, Tmax, Tibero와 필요한 환경 변수가 구성된 경우 그 환경에서 실행한다. 현재 환경이 소스 체크아웃만 제공해 실행할 수 없다면 정적 검사까지 수행하고, 생략한 동적 검증과 필요한 런타임을 보고한다.
+- 아래 런타임 명령은 선택한 환경에 OpenFrame, Tmax, 선택한 RDBMS와 필요한 환경 변수가 구성된 경우 그 환경에서 실행한다. 현재 환경이 소스 체크아웃만 제공해 실행할 수 없다면 정적 검사까지 수행하고, 생략한 동적 검증과 필요한 런타임을 보고한다.
 - Tmax의 기동과 종료는 `tmboot`, `tmdown`으로 하며, 상태는 `tmadmin`으로 확인할 수 있다. `tmadmin`에서는 `quit`으로 빠져나온다.
 - 선택한 프로필의 `rdb_connect_string`으로 Tibero는 `tbsql`, Oracle은 `sqlplus`를 사용한다. 암호를 명령 인자나 로그에 노출하지 않고 대화형 인증 또는 출력하지 않는 stdin으로 전달한다.
-- 각종 커맨드라인 툴 프로그램은 `base/tool`에서 빌드된다.
-- `.tbc`, `.pc` 확장자 파일을 수정한 경우 `make precomp`로 재빌드한다.
-- `make precomp`가 실패하면 원인을 수정한 뒤 반드시 다시 실행한다.
+- 커맨드라인 툴은 실제 소스 경로와 Makefile을 확인해 빌드한다. 7.3/7.4 참고 경로는 `base/src/tool`이며 `base/tool`을 고정하지 않는다.
+- `.tbc`, `.pc`를 수정하면 해당 Makefile의 `make precomp`를 실행하고, 실패 원인을 수정한 뒤 반드시 재실행한다.
 - `$OPENFRAME_HOME`은 `make install` 산출물과 OpenFrame 로그·운영 생성 파일의 기준 경로다.
 - 오류 로그는 화면 출력과 `$TMAXDIR/log`, `$OPENFRAME_HOME/log` 디렉터리를 확인한다.
 - 오류 코드에 대한 상세 설명은 `oferror 에러코드` 커맨드로 조회한다.
@@ -207,33 +139,21 @@ PowerShell 환경 파일이면 `Test-Path`로 확인하고 dot-source한 뒤 `$e
 ## 작업 원칙
 - 실제 Git 커밋은 사용자가 명시적으로 커밋을 지시한 경우에만 생성한다. 코드·스킬·문서 수정, 빌드·테스트 또는 staging 요청만으로 커밋 권한을 추정하지 않는다. 사용자 지시 없이 `git commit`, `git commit-tree` 등으로 커밋 객체나 커밋을 가리키는 참조를 생성·갱신하지 않는다. 이전 작업의 커밋 지시는 이후 작업에 자동으로 이어지지 않는다.
 - 작업 대상이 Git 저장소이면 본 작업 전에 현재 브랜치와 작업 트리 상태를 확인하고, 기존 변경을 보존한 채 `git pull --ff-only`를 반드시 먼저 시도한다. pull에 실패하면 원인과 원격 변경 반영 여부를 확인해 보고하며, 임의로 병합하거나 변경을 되돌리지 않는다.
-- Jira 이슈의 소스를 수정할 때는 원래 작업 중인 브랜치 이름을 먼저 확인·기록하고, 그 브랜치에서 `git pull --ff-only`로 최신 소스를 반영한 뒤 이슈 작업 브랜치를 만든다. pull이 실패하면 실행 명령·오류 내용·최신 소스 반영 여부를 사용자에게 보고한다. 실패 상태를 최신 소스 반영 완료로 간주하지 않으며 기존 변경을 보존한다.
-- Jira 이슈 작업 브랜치 이름은 `<원래 브랜치>-<Jira ID>`로 지정한다. 예: `rb_73-OPENFRAME-830`, `rb_73-OFV7-5557`. pull 후 원래 브랜치의 HEAD에서 `git switch -c <작업 브랜치>`로 생성한다. 같은 이름의 브랜치가 이미 있으면 시작점과 기존 작업을 확인하여 재사용 여부를 판단하고, 임의로 삭제·덮어쓰기하지 않는다. 이 절차는 Jira 소스 수정에 적용하며 읽기 전용 분석에는 브랜치 생성을 요구하지 않는다.
-- 모든 파일 수정, 빌드, 테스트는 반드시 선택한 환경의 `env_path`를 먼저 적용한 같은 셸에서 `$SOURCE_BASE`로 이동해 수행한다. `local` 프로필은 로컬 호스트에서, `remote` 프로필은 SSH 대상 서버에서, `remote_container` 프로필은 해당 컨테이너 안에서 수행한다.
-- 현재 위치가 애매하면 현재 셸에 맞는 명령으로 작업 경로와 디렉터리 내용을 먼저 확인한 뒤 진행한다.
-- 경로를 추측하지 말고, 실제 존재를 확인한 후에만 명령을 실행한다.
+- OpenFrame 제품 소스 저장소는 SSH로 접근한다. 기존 체크아웃의 `git remote -v`와 서버의 현재 clone 주소를 확인하고 사용자·호스트·포트·저장소 경로를 검증한다. 신규 clone은 해당 SSH 주소를 사용하며, 기존 HTTP remote의 전환은 대상 저장소와 주소가 확인된 요청 범위에서만 수행한다. 이 지침 저장소나 매뉴얼 등 별도 저장소에 같은 주소·전환 규칙을 임의 적용하지 않는다.
+- Git SSH 인증은 clone·fetch·pull이 실행되는 호스트 또는 컨테이너의 설정으로 확인한다. 개발 VM 접속용 SSH 키를 Git 서버용 키로 추정하거나 복사하지 않는다. 인증 실패 시 HTTP로 자동 우회하거나 호스트 키 검증을 비활성화하지 않고 필요한 인증·신뢰 설정을 해당 세션에서 사용자와 확인한다.
+- Jira 소스 수정은 원래 브랜치를 기록하고 위 pull 절차를 완료한 뒤 이슈 브랜치를 만든다. pull 실패 시 실행 명령·오류·최신 소스 반영 여부를 보고하고 최신 반영 완료로 간주하지 않는다.
+- Jira 이슈 작업 브랜치 이름은 `<원래 브랜치>-<Jira ID>`로 지정한다. pull 후 원래 브랜치의 HEAD에서 `git switch -c <작업 브랜치>`로 생성한다. 같은 이름의 브랜치가 이미 있으면 시작점과 기존 작업을 확인하여 재사용 여부를 판단하고, 임의로 삭제·덮어쓰기하지 않는다. 이 절차는 Jira 소스 수정에 적용하며 읽기 전용 분석에는 브랜치 생성을 요구하지 않는다.
+- 제품 소스 수정·빌드·테스트의 실행 위치와 환경 적용은 위 작업 환경 절차를 따른다.
+- 명령 실행 전 현재 작업 위치와 대상 경로의 존재를 확인한다. 소스 구조가 다르면 실제 트리와 사용처를 확인하고 경로를 추측하지 않는다.
 - 수정한 범위와 직접 관련된 빌드와 테스트를 우선 수행한다.
 - 영향 범위가 넓거나 실패가 재현되면 상위 단위의 회귀 테스트를 추가로 수행한다.
 - 실패하면 로그와 에러 메시지를 확인하고 원인을 좁힌 뒤 다시 시도한다.
-- 불필요한 변경은 최소화하고, 요청 범위에 맞는 파일만 수정한다.
-- 작업과 무관한 파일이나 설정은 건드리지 않는다.
+- 요청에 직접 필요한 파일·설정만 최소 범위로 수정하고 기존의 무관한 작업은 보존한다.
 - 사용자에게는 진행 상태, 발견한 문제, 검증 결과를 간결하게 보고한다.
 
-## 권장 작업 절차
-1. 요청과 제공된 Jira URL 등 입력 자료에서 작업 범위를 파악한다.
-2. 필요한 스킬의 트리거 여부를 판단하고, 호출한다면 해당 `SKILL.md`와 필요한 참조 문서를 먼저 읽는다.
-3. 로컬 설정에서 작업 대상에 맞는 환경 프로필을 선택하고, 그 환경에서 `env_path`를 적용한 뒤 `$SOURCE_BASE`, `$OPENFRAME_HOME`, 대상 경로와 현재 위치를 확인하고 루트부터 대상까지 적용되는 모든 `AGENTS.md`를 읽는다.
-4. Jira 등 외부 자료의 확인된 사실과 추론을 구분해 요구사항을 정리하고, 관련 코드·설정·호출 경로를 확인한다.
-5. 필요한 수정만 선택한 환경의 `$SOURCE_BASE`에서 적용한다.
-6. 대상 하위 `AGENTS.md`가 요구하는 빌드 또는 테스트를 실행한다.
-7. 결과를 확인하고, 실패 시 로그·오류 코드·처리 흐름으로 원인을 좁혀 수정 후 다시 검증한다. 런타임 부재로 검증할 수 없는 항목은 실패와 구분해 명시한다.
-8. 적용한 지침과 스킬, 변경 사항, 검증 명령, 성공·실패 결과를 요약한다.
-
 ## 명령 실행 기준
-- 단발성 명령은 직접 실행한다.
-- 반복되는 작업은 스크립트나 명령을 재사용 가능하게 정리한다.
-- 위험한 명령은 실행 전에 영향 범위를 확인한다.
-- 파일 삭제, 대규모 변경, 설정 변경은 특히 주의한다.
+- 단발성 명령은 직접 실행하고, 반복 작업은 재사용 가능한 스크립트나 명령으로 정리한다.
+- 삭제·대규모 변경·설정 변경 등 위험한 명령은 실행 전에 대상과 영향 범위를 확인한다.
 
 ## 보고 기준
 
@@ -245,6 +165,7 @@ PowerShell 환경 파일이면 `Test-Path`로 확인하고 dot-source한 뒤 `$e
 - 비교 항목별 설명이 짧고 한눈에 대조할 수 있으면 표를 사용한다. 설명이 길거나 코드·근거·예외 조건이 많아 표의 가독성이 떨어지면 항목별 문단으로 나누고, 각 항목 안에서 `AS-IS`, `TO-BE`, 효과·위험·검증 상태를 같은 순서로 설명한다. 요약 비교는 표로, 상세 설명은 문단으로 병행할 수 있다.
 
 작업 결과를 보고할 때는 다음을 포함한다.
+
 - 무엇을 변경했는지
 - 어떤 명령으로 검증했는지
 - 검증 결과가 성공인지 실패인지
@@ -256,5 +177,4 @@ PowerShell 환경 파일이면 `Test-Path`로 확인하고 dot-source한 뒤 `$e
 - 기술 동작, 장애 원인 및 용어는 실제 코드 또는 메타데이터, 필요하면 둘 다에 근거해 설명한다. 코드 근거는 파일·위치와 함수·필드명을, 메타데이터 근거는 조회 명령과 실제 필드·값을 명시한다.
 - 용어는 코드나 메타데이터의 식별명(예: `FILESEQ`, `fileseq`, `pos`)을 함께 적고 의미와 적용 범위를 설명한다. 서로 다른 저장 위치나 역할의 값을 같은 개념으로 뭉뚱그리지 않는다.
 - 관찰된 사실, 코드·메타데이터에서 도출한 추론, 미확인 사항을 구분한다. 로그나 현상만으로 내부 필드의 의미 또는 원인을 단정하지 않는다.
-- 재현 가능한 방식으로 작업한다.
-- 소스 구조가 다르면 임의로 가정하지 말고 실제 구조를 확인한다.
+- 사용한 명령과 입력·환경을 기록해 결과를 재현할 수 있게 한다.
