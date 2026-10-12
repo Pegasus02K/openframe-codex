@@ -7,7 +7,7 @@
 # New files still require `git add -A`; `git add -u` only stages tracked files.
 !/.agents/
 !/.agents/.gitignore
-!/.agents/openframe.local.yaml.sample
+!/openframe.local.yaml.sample
 !/.agents/skills/
 !/.agents/skills/**
 !**/.agents/
@@ -59,3 +59,6 @@ Thumbs.db
 *.mov
 *.wmv
 
+
+# Keep root machine-specific OpenFrame settings private.
+/openframe.local.yaml

@@ -1,7 +1,7 @@
 # Configuration schema version; OpenFrame product version is set per profile.
 version: 4
 
-# Copy this file to .agents/openframe.local.yaml, then replace the example
+# Copy this file to openframe.local.yaml, then replace the example
 # values with paths and connection settings for your own environment.
 # Keep openframe.local.yaml private; do not put real credentials in this sample.
 # Per-profile properties:

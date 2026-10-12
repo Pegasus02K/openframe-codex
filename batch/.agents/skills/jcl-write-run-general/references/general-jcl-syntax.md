@@ -2,7 +2,7 @@
 
 ## 매뉴얼 선택
 
-기준 루트는 `.agents/openframe.local.yaml`의 `manual_base` 아래 `openframe_batch/docs/modules`이다. 실제 디렉터리와 파일 존재를 확인한 후 읽는다.
+기준 루트는 `openframe.local.yaml`의 `manual_base` 아래 `openframe_batch/docs/modules`이다. 실제 디렉터리와 파일 존재를 확인한 후 읽는다.
 
 | BATCH_OS_TYPE | JCL | 유틸리티 | TJES |
 | --- | --- | --- | --- |

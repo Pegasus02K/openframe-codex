@@ -9,7 +9,7 @@ description: OpenFrame Base 테스트에 필요한 TSAM VSAM 데이터셋과 cop
 
 ## 작업 위치와 사전 확인
 
-1. 루트 `AGENTS.md`와 `.agents/openframe.local.yaml`에서 작업 대상에 맞는 환경 프로필을 선택하고, 환경 파일에서 읽은 `$SOURCE_BASE`에서 작업한다.
+1. 루트 `AGENTS.md`와 `openframe.local.yaml`에서 작업 대상에 맞는 환경 프로필을 선택하고, 환경 파일에서 읽은 `$SOURCE_BASE`에서 작업한다.
 2. 다음 값을 추측하지 말고 확인한다.
 
 ```bash
