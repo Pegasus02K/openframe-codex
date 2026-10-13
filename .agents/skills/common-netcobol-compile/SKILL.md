@@ -10,14 +10,7 @@ description: 후지쯔 사양 COBOL 테스트 프로그램을 ofcbppf로 전처�
 ## 사전 확인
 
 1. 루트 `AGENTS.md`의 프로필 선택·접속·인증·환경 적용 절차를 따른다. 제품 작업은 환경 파일에서 읽은 `$SOURCE_BASE`에서 수행한다.
-2. `common-ofconfig-manage`로 현재 노드의 `ofsys.COMPILER.COBOL_COMPILER`를 조회하고 `DEFAULT_VALUE`가 아닌 현재 `VALUE`로 컴파일러를 선택한다.
-
-```bash
-test -n "${OPENFRAME_NODENAME:-}" || exit 1
-ofconfig list -n "$OPENFRAME_NODENAME" -s ofsys -sec COMPILER -k COBOL_COMPILER -l
-```
-
-`NETCOBOL`이면 이 스킬을 계속 적용하고, `OFCOBOL`이면 `common-ofcobol-compile`로 라우팅한다. `MFCOBOL`이면 대상 환경의 Micro Focus 절차를 확인한다. 조회 실패·빈 값·알 수 없는 값은 원인을 보고하고 컴파일하지 않는다. 컴파일러 선택을 위해 설정을 변경하지 않으며 스크립트의 호출 명령이 조회한 `VALUE`와 다르면 그대로 실행하지 않는다.
+2. 루트 `AGENTS.md`의 「COBOL 컴파일러 라우팅」에 따라 현재 `VALUE`를 확인한다. `NETCOBOL`일 때만 이 스킬을 적용하며 조회 실패·빈 값·알 수 없는 값의 처리도 루트 절차를 따른다.
 
 3. 소스 파일, copybook, `PROGRAM-ID`, COBOL `SELECT`의 DD 이름, JCL의 프로그램명·DD·`PRGLIB`를 대조한다.
 4. 도구와 환경을 확인한다.
@@ -35,10 +28,10 @@ printf '%s\n' "$COBDIR" "$COBCOPY"
 
 RECFM, LRECL, DISP 같은 생성 속성이나 `tcobfh`/`acobfh`를 사용하는 COBOL 파일 입출력 동작을 확인할 때 다음 원칙으로 전용 프로그램을 만든다.
 
-- 하나의 `SELECT`와 하나의 `FD`만 두고 JCL DD 이름을 정확히 맞춘다.
-- 재현 대상에 필요한 `OPEN OUTPUT`, 최소 한 번의 `WRITE`, `CLOSE`만 수행한다.
-- 각 I/O 직후 두 자리 FILE STATUS를 `DISPLAY`하고 00이 아니면 명확한 RC로 끝낸다.
-- `CLOSE WITH LOCK`, 두 번째 OPEN, 기존 샘플의 업무 로직처럼 결과 판정을 흐릴 동작을 넣지 않는다.
+- 재현에 필요한 최소 `SELECT`·`FD`만 두고 JCL DD 이름을 정확히 맞춘다.
+- 재현 조건에 필요한 OPEN 모드와 I/O 순서를 정하고 결과 판정에 불필요한 업무 로직을 제외한다. 생성 재현은 `OPEN OUTPUT`·`WRITE`·`CLOSE`를 최소 예제로 사용할 수 있다.
+- 각 I/O 직후 두 자리 FILE STATUS를 `DISPLAY`하고 해당 테스트의 기대값과 비교한다. 예상한 오류 상태와 예기치 않은 실패를 구분해 RC와 결과를 보고한다.
+- 재OPEN·잠금·동시 접근이 재현 조건이면 필요한 연산을 포함하고 각 I/O 결과를 구분한다.
 - `FD`의 record 크기와 JCL의 LRECL을 일치시킨다.
 - 프로그램명과 데이터셋 qualifier는 각각의 길이 제한을 확인한다.
 
@@ -73,6 +66,8 @@ test -s TESTPGM
 
 ## 테스트 라이브러리에 배치
 
+컴파일만 요청받았으면 배치·동적 반영·JOB 제출을 수행하지 않는다. Makefile이나 스크립트의 복사·삭제·배치 부작용을 먼저 확인하고 요청된 단계만 실행한다.
+
 JCL의 `PRGLIB` 또는 테스트 Makefile에서 실제 목적지를 확인한다. 예제의 `PROD.BATCHLIB`이 현재 환경에 존재한다고 가정하지 않는다. 기본 후보가 `SYS1.COBLIB`이어도 실제 catalog, volume, 물리 경로를 확인한 뒤 사용한다.
 
 배치 전에 다음을 확인한다.
@@ -99,7 +94,7 @@ test ! -e "$program_library/TESTPGM" || printf 'existing member: %s\n' "$program
 
 - 전처리 파일과 최종 shared object가 비어 있지 않은지 확인한다.
 - 최종 모듈 이름과 배치 경로가 JCL과 일치하는지 확인한다.
-- `$batch-job-run`으로 절대 JCL 경로를 제출하고 JOB 번호, STEP RC, SPOOL, 생성 데이터셋을 확인한다.
+- JOB 실행도 요청받았으면 OS별 JCL 작성 스킬과 `batch-job-run`에 따라 실제 JCL 라이브러리·멤버를 확인해 제출하고 JOB ID·STEP RC·SPOOL·생성 데이터셋을 검증한다.
 - OPEN 재현에서는 JOB 최종 RC만 보지 말고 각 I/O의 FILE STATUS와 `dslist -a` 결과를 함께 확인한다.
 - 실패 시 컴파일러의 첫 오류, `$TMAXDIR/log`, `$OPENFRAME_HOME/log`를 확인하고 OpenFrame 오류는 `oferror <error-code>`로 조회한다.
 

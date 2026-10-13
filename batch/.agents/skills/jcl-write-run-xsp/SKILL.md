@@ -29,7 +29,7 @@ ofconfig list -n "$node_name" -k BATCH_OS_TYPE -l
 
 JOB명, 실행 프로그램, STEP 순서와 조건, FD 이름, 입력·출력 데이터셋, 인라인 입력, 예상 STEP RC, 확인할 SPOOL 또는 최종 데이터셋 결과를 정리한다. 빠진 정보는 기존 JCL, 프로그램 소스, 유틸리티 매뉴얼에서 확인하고 추측하지 않는다.
 
-프로그램이나 유틸리티별 FD와 제어문은 `{{manual_base}}/openframe_batch/docs/modules/xsp-utility-reference-guide`에서 먼저 찾는다. COBOL 모듈 준비가 필요하면 `$common-netcobol-compile`을 사용한다.
+프로그램이나 유틸리티별 FD와 제어문은 `{{manual_base}}/openframe_batch/docs/modules/xsp-utility-reference-guide`에서 먼저 찾는다. COBOL 모듈 준비가 필요하면 루트의 컴파일러 라우팅으로 `common-ofcobol-compile` 또는 `common-netcobol-compile`을 선택한다.
 
 ### 2. XSP 문법으로 작성하기
 
@@ -53,7 +53,7 @@ JCL을 작성하거나 MVS 형식을 변환하기 전에 [XSP JCL 문법](refere
 5. 기존 `SYS1.JCLLIB` 멤버와 같은 이름이면 명시적 승인 없이 덮어쓰지 않는다.
 6. 요청된 결과가 STEP RC만으로 충분한지 판단하고, 파일·카탈로그·DB 결과가 기준이면 별도 검증 명령을 정한다.
 
-새로 작성·변환한 FD 문법이 불확실하면 실제 RUN 전에 `tjesmgr SCAN "$jcl_member"`로 확인한다. SCAN도 JOBQ/SPOOL을 생성하므로 실제 JOB ID를 기록하고 결과를 확인한다. SCAN 성공은 유틸리티 실행이나 데이터셋·장치 할당 성공의 증거가 아니다. 출력 장치 또는 테이프를 사용하는 경우 [FD 작성·실패 점검 사례](references/xsp-fd-checks.md)에서 문법 오류와 환경 준비 실패를 구분한다.
+작성·수정만 요청되면 매뉴얼과 기존 JCL로 정적 점검한다. 실행 검증 또는 SCAN이 요청 범위에 포함되고 FD 문법이 불확실하면 RUN 전에 `tjesmgr SCAN "$jcl_member"`로 확인한다. SCAN도 JOBQ/SPOOL을 생성하므로 실제 JOB ID를 기록하고 결과를 확인한다. SCAN 성공은 유틸리티 실행이나 데이터셋·장치 할당 성공의 증거가 아니다. 출력 장치 또는 테이프를 사용하는 경우 [FD 작성·실패 점검](references/xsp-fd-checks.md)에서 문법 오류와 환경 준비 실패를 구분한다.
 
 ### 4. 실제 실행하고 검증하기
 

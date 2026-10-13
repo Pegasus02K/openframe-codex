@@ -10,7 +10,7 @@ description: OpenFrame COBOL(ofcob)로 MVS·MSP·XSP·VOS3 테스트 프로그�
 ## 환경과 도구 확인
 
 1. 루트 `AGENTS.md`의 프로필 선택·접속·인증·환경 적용 절차를 따른다. 프로필의 `version`, `os`, `rdb`를 사용하고 `$SOURCE_BASE` 아래 대상 제품과 더 가까운 `AGENTS.md`도 적용한다.
-2. 아래 컴파일러 라우팅을 먼저 수행한다. `VALUE=OFCOBOL`인 경우에만 이후 OFCOBOL 도구 검증과 컴파일 절차를 진행한다.
+2. 루트 `AGENTS.md`의 「COBOL 컴파일러 라우팅」을 먼저 수행한다. `VALUE=OFCOBOL`인 경우에만 이후 OFCOBOL 도구 검증과 컴파일 절차를 진행한다.
 3. `env_path` 파일의 OFCOBOL 관련 설정만 확인한다. `OFCOB_HOME`이 환경 파일 또는 명시적으로 불러오는 하위 환경 파일에 정의되어 있어야 한다. 이전 셸에서 상속된 값만으로 준비 완료로 판단하지 않는다. 환경 파일 전체나 DB 접속 문자열은 출력하지 않는다.
 4. 환경 파일 적용 후 설치 루트·실행파일·라이브러리·parser 설정을 확인한다.
 
@@ -25,25 +25,6 @@ ofcob -h
 ```
 
 `PATH`의 `ofcob`가 선택한 설치본과 일치하는지 확인한다(심볼릭 링크는 실제 경로를 비교한다). 환경 파일의 `PATH`, `LD_LIBRARY_PATH`, `COBPARSER_HOME` 설정을 확인하고 parser 경로가 필요한 설치본에서는 그 디렉터리 존재도 검증한다. copybook 경로는 대상 소스의 `COPY`와 실제 파일을 기준으로 확인한다. 누락되거나 다른 설치본을 가리키면 원인을 보고하고 컴파일을 중단한다. 개인 환경 파일을 요청 없이 수정하지 않는다.
-
-## 컴파일러 라우팅
-
-환경 파일 적용 후 `common-ofconfig-manage`로 현재 노드의 `ofsys.COMPILER.COBOL_COMPILER`를 상세 조회한다.
-
-```bash
-test -n "${OPENFRAME_NODENAME:-}" || exit 1
-ofconfig list -n "$OPENFRAME_NODENAME" -s ofsys -sec COMPILER -k COBOL_COMPILER -l
-```
-
-`DEFAULT_VALUE`가 아니라 현재 `VALUE`로 컴파일러를 선택한다.
-
-| 조회한 VALUE | 적용 절차 |
-| --- | --- |
-| `OFCOBOL` | 이 스킬의 `ofcob` 절차 및 OS별 옵션 |
-| `NETCOBOL` | `common-netcobol-compile`의 전처리·NetCOBOL 절차 |
-| `MFCOBOL` | 대상 환경의 Micro Focus 컴파일 절차를 확인해 적용 |
-
-조회 실패·빈 값·알 수 없는 값은 기본값이나 설치된 바이너리로 대신 판단하지 않고 원인을 보고한다. 컴파일러 선택을 위해 설정을 변경하지 않는다. 스크립트의 컴파일러 호출이 `VALUE`와 다르면 그대로 실행하지 말고 설정에 맞는 컴파일 명령을 구성한다. 이후 소스 사양·OS·copybook·제품별 링크 옵션을 확인한다.
 
 ## OS별 컴파일 선택
 

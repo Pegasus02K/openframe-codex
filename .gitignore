@@ -4,7 +4,7 @@
 #     https://www.atlassian.com/git/tutorials/saving-changes/gitignore
 
 # Project agent definitions are shared source files and must remain visible to Git.
-# New files still require `git add -A`; `git add -u` only stages tracked files.
+# Stage reviewed paths explicitly; `git add -u` does not include new files.
 !/.agents/
 !/.agents/.gitignore
 !/openframe.local.yaml.sample

@@ -35,11 +35,12 @@ jcl_member=TESTJCL
 jcl_library="$OPENFRAME_HOME/volume_DEFVOL/SYS1.JCLLIB"
 test -f "$jcl_source"
 test -d "$jcl_library"
+test ! -e "$jcl_library/$jcl_member" || exit 1
 cp -- "$jcl_source" "$jcl_library/$jcl_member"
 cmp -- "$jcl_source" "$jcl_library/$jcl_member"
 ```
 
-확장자 제거 여부와 멤버명은 대상 테스트의 기존 Makefile/JCL 관례를 따른다. 없는 `SYS1.JCLLIB` 디렉터리를 임의로 만들지 않는다.
+확장자 제거 여부와 멤버명은 대상 테스트의 기존 Makefile/JCL 관례를 따른다. 예제는 새 멤버 배치용이다. 기존 멤버 교체는 요청 범위와 복구 방법을 확인한 뒤 수행한다. 없는 `SYS1.JCLLIB` 디렉터리를 임의로 만들지 않는다.
 
 ## JOB 제출
 
@@ -85,7 +86,7 @@ $ tjesmgr
 - `ERROR`, 비정상 RC, 예상과 다른 SPOOL이 있으면 실패한 STEP과 DD를 특정한다.
 - 화면 출력과 `$TMAXDIR/log`, `$OPENFRAME_HOME/log`를 확인한다.
 - OpenFrame 오류 코드는 `oferror <error-code>`로 상세 내용을 조회한다.
-- JCL, 프로그램 모듈, TSAM 입력 준비 문제를 구분하고 관련 스킬인 `$common-netcobol-compile` 또는 `$base-tsam-create`로 필요한 선행 작업만 수행한다.
+- JCL, 프로그램 모듈, TSAM 입력 준비 문제를 구분한다. COBOL 빌드는 루트의 컴파일러 라우팅에 따라 `common-ofcobol-compile` 또는 `common-netcobol-compile`을 적용하고, TSAM 준비는 `base-tsam-create`로 요청 범위의 선행 작업만 수행한다.
 
 최종 보고에는 배치한 JCL 경로, JOB ID, 최종 상태, STEP별 RC, 확인한 SPOOL DD와 핵심 결과를 포함한다.
 
