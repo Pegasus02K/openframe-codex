@@ -33,7 +33,7 @@ printf '%s\n' "$COBDIR" "$COBCOPY"
 
 ## 파일 OPEN 재현 프로그램 설계
 
-RECFM, LRECL, DISP 같은 생성 속성이나 `tcobfh`/`acobfh` 동작을 확인할 때 다음 원칙으로 전용 프로그램을 만든다.
+RECFM, LRECL, DISP 같은 생성 속성이나 `tcobfh`/`acobfh`를 사용하는 COBOL 파일 입출력 동작을 확인할 때 다음 원칙으로 전용 프로그램을 만든다.
 
 - 하나의 `SELECT`와 하나의 `FD`만 두고 JCL DD 이름을 정확히 맞춘다.
 - 재현 대상에 필요한 `OPEN OUTPUT`, 최소 한 번의 `WRITE`, `CLOSE`만 수행한다.
@@ -57,7 +57,7 @@ test -s ofcbppf_TESTPGM.cob
 
 ## NetCOBOL 컴파일
 
-후지쯔 NetCOBOL 테스트 프로그램의 기본 패턴은 다음과 같다.
+후지쯔 NetCOBOL 테스트 프로그램의 기본 패턴은 다음과 같다. 공개된 라이브러리 이름과 링크 옵션을 사용하며, 실제 적용 전 대상 Makefile·매뉴얼과 현재 설치본에서 해당 옵션을 확인한다.
 
 ```bash
 cobol -dy -shared \
@@ -67,7 +67,7 @@ cobol -dy -shared \
 test -s TESTPGM
 ```
 
-파일 입출력 전처리를 사용하므로 `-ltcobfh`를 누락하지 않는다. 테스트가 AIM, NDB 등 추가 기능을 사용하면 원본 Makefile과 매뉴얼에 명시된 라이브러리만 추가한다. `PROGRAM-ID`와 JCL 호출명에 맞춰 main program 산출물 이름을 정한다. 서브 프로그램은 해당 테스트의 shared object 명명 규칙을 따른다.
+파일 입출력 전처리를 사용하므로 필요한 `-ltcobfh`를 누락하지 않는다. 테스트가 AIM, NDB 등 추가 기능을 사용하면 원본 Makefile과 매뉴얼에 명시된 라이브러리만 추가한다. `PROGRAM-ID`와 JCL 호출명에 맞춰 main program 산출물 이름을 정한다. 서브 프로그램은 해당 테스트의 shared object 명명 규칙을 따른다.
 
 여러 소스를 빌드할 때는 각 `ofcbppf` 성공을 확인한 뒤 해당 파일을 컴파일한다. 하나라도 실패하면 배치 단계로 넘어가지 않는다.
 

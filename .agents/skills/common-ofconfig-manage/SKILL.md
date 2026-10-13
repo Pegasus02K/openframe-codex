@@ -166,5 +166,4 @@ ofconfig list   -n "$node_name" -s "$subject" -sec "$section" -k "$key" -l
 
 - 명령 매뉴얼: `{{manual_base}}/openframe_base/docs/modules/tool-reference-guide/pages/etc/sect-ofconfig.adoc`
 - 설정 매뉴얼: 관련 제품 매뉴얼의 `configuration-guide`
-- 명령 구현: `$SOURCE_BASE/base/src/tool/ofconfig/ofconfig_main.c`
-- 설정 공통 구현: `$SOURCE_BASE/base/src/common/ofcom/ofcom_conf.c`
+- 매뉴얼과 실제 동작이 다르면 승인된 작업 환경의 현재 소스에서 명령 처리와 설정 적용 경로를 확인한다. 내부 구현의 식별명·코드·처리 내용은 이 스킬에 기록하지 않는다.

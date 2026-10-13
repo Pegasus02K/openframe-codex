@@ -74,7 +74,7 @@ command -v ofcbpph || exit 1
 - 소스, `PROGRAM-ID`, copybook, 출력 모듈명, JCL 호출명·DD·프로그램 라이브러리를 대조한다. main/subprogram과 shared object 여부는 실제 대상 스크립트를 따른다. HiDB·NDB 예제의 `-U`를 모든 TSAM 프로그램에 일괄 추가하지 않는다.
 - `ofcbpp`, `ofcbppf`, `ofcbpph`를 서로 바꿔 사용하지 않는다. 별도 전처리가 필요하면 해당 도구와 copybook 경로를 확인하고 성공 RC와 새 출력 파일을 확인한 뒤 컴파일한다.
 - `-L`, `-l`, `OFCOBCPY`, DB client 경로, encoding·추가 옵션은 대상 Makefile·스크립트 및 설치 버전의 지원 여부로 결정한다. 과거 절대 경로나 다른 DB의 라이브러리를 복사하지 않는다.
-- TSAM의 기본 예제는 다음과 같다. MSP/XSP Makefile은 아래처럼 `-ltextfh`를 명시하지 않으므로 MVS 링크 옵션을 무조건 덧붙이지 않는다.
+- TSAM의 OS별 명령 구성 예시는 다음과 같다. 공개된 `textfh` 라이브러리 이름과 링크 옵션을 사용하며, 실제 적용 전 대상 Makefile·매뉴얼과 현재 설치본을 확인한다. MSP/XSP에도 MVS의 링크 옵션을 무조건 덧붙이지 않는다.
 
 ```bash
 # MVS
@@ -89,7 +89,7 @@ ofcob TESTPGM.cob --enable-VOS -g -o TESTPGM -L"$OPENFRAME_HOME/lib" -ltextfh
 
 ## 배치와 검증
 
-Makefile·스크립트에 `mv`, `cp`, `dlupdate`, 생성 파일 삭제, 스키마 변경이 포함되는지 먼저 확인한다. 컴파일만 요청받았으면 컴파일 단계만 분리한다. TSAM의 OS target은 프로그램·JCL 배치도 수행하므로 단순 컴파일 확인을 위해 전체 target을 실행하지 않는다.
+Makefile·스크립트에 `mv`, `cp`, `dlupdate`, 생성 파일 삭제, 스키마 변경이 포함되는지 먼저 확인한다. 컴파일만 요청받았으면 컴파일 단계만 분리한다. OS target의 부작용을 확인하기 전에는 단순 컴파일 확인을 위해 전체 target을 실행하지 않는다.
 
 배치가 요청 범위에 있으면 실제 프로그램 라이브러리의 catalog·volume·물리 경로와 호출 멤버명을 확인한다. 기존 멤버 교체 범위와 복구 방법을 확인하고 컴파일이 모두 성공한 뒤 배치한다. `dlupdate`는 사용법·임시 라이브러리 전제·성공 RC를 확인한다. 예제의 `SYS1.COBLIB`, `SYS1.USERLIB`, `PDS.P...`가 현재 환경에 있다고 가정하지 않는다.
 
